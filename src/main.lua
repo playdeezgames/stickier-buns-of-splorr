@@ -3,6 +3,7 @@ if arg[#arg] == "debug" then
 end
 local mousemap = require("mousemap")
 local constants = require("constants")
+local scroller = require("scroller")
 
 local lightTile
 local darkTile
@@ -18,7 +19,7 @@ function love.load(args)
 end
 
 function plotXY(x,y)
-    return constants.SCREEN_WIDTH / 2 - constants.TILE_WIDTH / 2 + (x - y) * (constants.TILE_WIDTH / 2) , (x + y) * (constants.TILE_HEIGHT / 2)
+    return scroller.toScreen((x - y) * (constants.TILE_WIDTH / 2), (x + y) * (constants.TILE_HEIGHT / 2))
 end
 
 function love.draw()

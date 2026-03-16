@@ -1,5 +1,6 @@
 local constants = require("constants")
-local M = {}
+local scroller = require("scroller")
+
 local MOUSEMAP_IMAGE_FILENAME = "assets/images/mousemap.png"
 local UPPER_LEFT = "ul"
 local UPPER_RIGHT = "ur"
@@ -10,6 +11,8 @@ local MINIMUM_X = 0
 local MAXIMUM_X = 7
 local MINIMUM_Y = 0
 local MAXIMUM_Y = 7
+
+local M = {}
 function clamp(value, minimum, maximum)
     return math.max(minimum, math.min(value, maximum))
 end
@@ -42,7 +45,7 @@ function M.load()
 end
 function M.mapXY(x,y)
     local mapX, mapY = cursorX, cursorY
-    x = x - constants.SCREEN_WIDTH / 2 + constants.TILE_WIDTH / 2
+    x, y = scroller.fromScreen(x, y)
     local gridX = math.floor(x / constants.TILE_WIDTH)
     local gridY = math.floor(y / constants.TILE_HEIGHT)
     local remainderX = x % constants.TILE_WIDTH

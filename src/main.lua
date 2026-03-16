@@ -4,17 +4,18 @@ end
 local mousemap = require("mousemap")
 local constants = require("constants")
 local scroller = require("scroller")
+local sprite = require("sprite")
 
-local lightTile
-local darkTile
-local cursorTile
 local cursorX = 0
 local cursorY = 0
+local cursorSprite
+local lightSprite
+local darkSprite
 
 function love.load(args)
-    lightTile = love.graphics.newImage("assets/images/lighttile.png")
-    darkTile = love.graphics.newImage("assets/images/darktile.png")
-    cursorTile = love.graphics.newImage("assets/images/cursor.png")
+    lightSprite = sprite.create(love.graphics.newImage("assets/images/lighttile.png"),0,0)
+    darkSprite = sprite.create(love.graphics.newImage("assets/images/darktile.png"),0,0)
+    cursorSprite = sprite.create(love.graphics.newImage("assets/images/cursor.png"),0,0)
     mousemap.load()
 end
 
@@ -25,14 +26,14 @@ end
 function love.draw()
     for x = 0, 7 do
         for y = 0, 7 do
-            local tile = lightTile
+            local which = lightSprite
             if (x+y)%2==1 then
-                tile = darkTile
+                which = darkSprite
             end
             local plotX, plotY = plotXY(x,y)
-            love.graphics.draw(tile, plotX, plotY)
+            which:draw(plotX,plotY)
             if x == cursorX and y == cursorY then
-                love.graphics.draw(cursorTile, plotX, plotY)
+                cursorSprite:draw(plotX, plotY)
             end
         end
     end

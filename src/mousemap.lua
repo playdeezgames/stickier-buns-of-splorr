@@ -44,7 +44,7 @@ function M.load()
     end
 end
 function M.mapXY(x,y)
-    local mapX, mapY = cursorX, cursorY
+    local mapX, mapY
     x, y = scroller.fromScreen(x, y)
     local gridX = math.floor(x / constants.TILE_WIDTH)
     local gridY = math.floor(y / constants.TILE_HEIGHT)

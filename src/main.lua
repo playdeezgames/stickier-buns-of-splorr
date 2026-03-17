@@ -19,7 +19,7 @@ function love.load(args)
     mousemap.load()
 end
 
-function plotXY(x,y)
+local function plotXY(x,y)
     return scroller.toScreen((x - y) * (constants.TILE_WIDTH / 2), (x + y) * (constants.TILE_HEIGHT / 2))
 end
 

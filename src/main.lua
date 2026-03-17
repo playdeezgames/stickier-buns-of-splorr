@@ -97,5 +97,4 @@ end
 --https://game-icons.net/1x1/delapouite/flanged-mace.html
 --https://game-icons.net/1x1/caro-asercion/dumpling-bao.html
 --https://game-icons.net/1x1/sbed/cancel.html
-
 --7z a -tzip -r ..\stickier.love *

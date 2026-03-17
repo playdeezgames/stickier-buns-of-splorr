@@ -13,7 +13,7 @@ local MINIMUM_Y = 0
 local MAXIMUM_Y = 7
 
 local M = {}
-function clamp(value, minimum, maximum)
+local function clamp(value, minimum, maximum)
     return math.max(minimum, math.min(value, maximum))
 end
 function M.load()

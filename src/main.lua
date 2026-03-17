@@ -74,6 +74,8 @@ function love.draw()
             end
         end
     end
+    love.graphics.print("Buns: "..world.avatar.buns.."/"..world.avatar.maximumBuns, 0, 10)
+    love.graphics.print("Health: "..world.avatar.health.."/"..world.avatar.maximumHealth, 0, 25)
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)

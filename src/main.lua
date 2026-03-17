@@ -6,6 +6,7 @@ local mousemap = require("mousemap")
 local constants = require("constants")
 local scroller = require("scroller")
 local sprite = require("sprite")
+local tokens = require("tokens")
 
 local cursorX = 0
 local cursorY = 0
@@ -16,8 +17,12 @@ local lightSpriteHilite
 local darkSpriteHilite
 local knightSprite
 local cancelSprite
+local bunSprite
+local buttholeSprite
 
 function love.load(args)
+    bunSprite = sprite.create(love.graphics.newImage("assets/images/bun.png"),40,-30)
+    buttholeSprite = sprite.create(love.graphics.newImage("assets/images/butthole.png"),40,20)
     cancelSprite = sprite.create(love.graphics.newImage("assets/images/cancel.png"),40,20)
     lightSprite = sprite.create(love.graphics.newImage("assets/images/lighttile.png"),0,0)
     darkSprite = sprite.create(love.graphics.newImage("assets/images/darktile.png"),0,0)
@@ -54,14 +59,18 @@ function love.draw()
             end
             local plotX, plotY = plotXY(x,y)
             which:draw(plotX,plotY)
-            if cell.cancel then
-                cancelSprite:draw(plotX, plotY)
-            end
             if x == cursorX and y == cursorY then
                 cursorSprite:draw(plotX, plotY)
             end
-            if x == world.avatar.x and y == world.avatar.y then
+            local token = cell.token
+            if token == tokens.KNIGHT then
                 knightSprite:draw(plotX, plotY)
+            elseif token == tokens.CANCEL then
+                cancelSprite:draw(plotX, plotY)
+            elseif token == tokens.BUN then
+                bunSprite:draw(plotX, plotY)
+            elseif token == tokens.BUTTHOLE then
+                buttholeSprite:draw(plotX, plotY)
             end
         end
     end
@@ -84,3 +93,7 @@ end
 --https://game-icons.net/1x1/skoll/spiked-bat.html
 --https://game-icons.net/1x1/delapouite/wood-club.html
 --https://game-icons.net/1x1/delapouite/flanged-mace.html
+--https://game-icons.net/1x1/caro-asercion/dumpling-bao.html
+--https://game-icons.net/1x1/sbed/cancel.html
+
+--7z a -tzip -r ..\stickier.love *

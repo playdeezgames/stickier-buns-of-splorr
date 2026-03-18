@@ -21,7 +21,7 @@ local bunSprite
 local buttholeSprite
 
 function love.load(args)
-    bunSprite = sprite.create(love.graphics.newImage("assets/images/bun.png"),40,-30)
+    bunSprite = sprite.create(love.graphics.newImage("assets/images/bun.png"),40,-20)
     buttholeSprite = sprite.create(love.graphics.newImage("assets/images/butthole.png"),40,20)
     cancelSprite = sprite.create(love.graphics.newImage("assets/images/cancel.png"),40,20)
     lightSprite = sprite.create(love.graphics.newImage("assets/images/lighttile.png"),0,0)
@@ -92,9 +92,11 @@ end
 --https://game-icons.net/1x1/skoll/chess-bishop.html
 --https://game-icons.net/1x1/skoll/chess-pawn.html
 --https://game-icons.net/1x1/sbed/flake.html
+--https://game-icons.net/1x1/sbed/cancel.html
+--https://game-icons.net/1x1/caro-asercion/dumpling-bao.html
+
 --https://game-icons.net/1x1/skoll/spiked-bat.html
 --https://game-icons.net/1x1/delapouite/wood-club.html
 --https://game-icons.net/1x1/delapouite/flanged-mace.html
---https://game-icons.net/1x1/caro-asercion/dumpling-bao.html
---https://game-icons.net/1x1/sbed/cancel.html
+
 --7z a -tzip -r ..\stickier.love *

@@ -49,6 +49,7 @@ local function hilite()
 end
 function M.initialize()
     world = {}
+    world.messages = {}
     world.board = {}
     for x = 0, constants.BOARD_WIDTH - 1 do
         world.board[x] = {}
@@ -65,7 +66,7 @@ function M.initialize()
         maximumBuns = 15,
         health = 3,
         maximumHealth = 3,
-        armour = 0,
+        armour = 5,
         jools = 0,
         floggers = 0,
         sprays = 0
@@ -80,6 +81,12 @@ function M.initialize()
 end
 function M.getWorld()
     return world
+end
+local function addMessage(message)
+    table.insert(world.messages, 1, message)
+    while #world.messages > 15 do
+        table.remove(world.messages)
+    end
 end
 local function uncancel()
     for x = 0, constants.BOARD_WIDTH - 1 do
@@ -104,18 +111,54 @@ local function starve()
     end
 end
 local function checkButthole()
+    addMessage("Checking butthole...")
     local result = butthole.check()
     if result == butthole.NOTHING then
     elseif result == butthole.JOOLS then
-        world.avatar.jools = world.avatar.jools + 3 + love.math.random(1,3) + love.math.random(1,3)
+        local jools = 3 + love.math.random(1,3) + love.math.random(1,3)
+        world.avatar.jools = world.avatar.jools + jools
+        addMessage("+"..jools.." Jools!")
     elseif result == butthole.TRAP then
     elseif result == butthole.TELEPORT then
     elseif result == butthole.ARMOUR then
         world.avatar.armour = world.avatar.armour + 1
+        addMessage("+1 Armour!")
     elseif result == butthole.FLOGGER then
         world.avatar.floggers = world.avatar.floggers + 1
+        addMessage("+1 Flogger!")
     elseif result == butthole.POTION then
         world.avatar.potions = world.avatar.potions + 1
+        addMessage("+1 Potion!")
+    end
+end
+local function takeDamage(damage)
+    while damage > 0 and world.avatar.armour > 0 do
+        damage = damage - 1
+        world.avatar.armour = world.avatar.armour - 1
+    end
+    while damage > 0 and world.avatar.health > 0 do
+        damage = damage - 1
+        world.avatar.health = world.avatar.health - 1
+    end
+end
+local function getPawnCount()
+    local result = 0
+    for x = 0, constants.BOARD_WIDTH - 1 do
+        for y = 0 , constants.BOARD_HEIGHT - 1 do
+            if world.board[x][y].token == tokens.PAWN then
+                result = result + 1
+            end
+        end
+    end
+    return result
+end
+local function spawnBishop()
+    spawnToken(tokens.BISHOP)
+end
+local function attackPawn()
+    takeDamage(1)
+    if getPawnCount() == 0 then
+        spawnBishop()
     end
 end
 function M.attemptMove(x,y)
@@ -137,11 +180,14 @@ function M.attemptMove(x,y)
     hilite()
     world.board[cancelX][cancelY].hilite = false
     if token == tokens.BUN then
+        addMessage("+5 buns")
         spawnToken(tokens.BUN)
         changeBuns(5)
     elseif token == tokens.BUTTHOLE then
         checkButthole()
         spawnToken(tokens.BUTTHOLE)
+    elseif token == tokens.PAWN then
+        attackPawn()
     end
 end
 return M

@@ -17,13 +17,16 @@ local lightSpriteHilite
 local darkSpriteHilite
 local knightSprite
 local pawnSprite
+local bishopSprite
 local cancelSprite
 local bunSprite
 local buttholeSprite
 local font
+local messageFont
 
 function love.load(args)
     font = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.FONT_SIZE)
+    messageFont = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.MESSAGE_FONT_SIZE)
     bunSprite = sprite.create(love.graphics.newImage("assets/images/bun.png"),40,-20)
     buttholeSprite = sprite.create(love.graphics.newImage("assets/images/butthole.png"),40,20)
     cancelSprite = sprite.create(love.graphics.newImage("assets/images/cancel.png"),40,20)
@@ -34,6 +37,7 @@ function love.load(args)
     cursorSprite = sprite.create(love.graphics.newImage("assets/images/cursor.png"),0,0)
     knightSprite = sprite.create(love.graphics.newImage("assets/images/knight.png"),40,-30)
     pawnSprite = sprite.create(love.graphics.newImage("assets/images/pawn.png"),40,-30)
+    bishopSprite = sprite.create(love.graphics.newImage("assets/images/bishop.png"),40,-30)
     mousemap.load()
     board.initialize()
 end
@@ -78,6 +82,8 @@ function love.draw()
                 buttholeSprite:draw(plotX, plotY)
             elseif token == tokens.PAWN then
                 pawnSprite:draw(plotX, plotY)
+            elseif token == tokens.BISHOP then
+                bishopSprite:draw(plotX, plotY)
             end
         end
     end
@@ -100,6 +106,13 @@ function love.draw()
     love.graphics.print("Armour: "..world.avatar.armour, 0, y)
     y = y + constants.LINE_HEIGHT
 
+    y = love.graphics.getHeight() - constants.MESSAGE_LINE_HEIGHT
+    love.graphics.setColor(1,1,1)
+    love.graphics.setFont(messageFont)
+    for _, v in ipairs(world.messages) do
+        love.graphics.print(v,0,y)
+        y = y - constants.MESSAGE_LINE_HEIGHT
+    end
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)

@@ -94,7 +94,7 @@ function love.draw()
     love.graphics.print("Buns: "..world.avatar.buns.."/"..world.avatar.maximumBuns, 0, y)
     y = y + constants.LINE_HEIGHT
 
-    love.graphics.setColor(0.66,0,0)
+    love.graphics.setColor(1,0.33,0.33)
     love.graphics.print("Health: "..world.avatar.health.."/"..world.avatar.maximumHealth, 0, y)
     y = y + constants.LINE_HEIGHT
 
@@ -104,6 +104,14 @@ function love.draw()
 
     love.graphics.setColor(1,1,0.33)
     love.graphics.print("Armour: "..world.avatar.armour, 0, y)
+    y = y + constants.LINE_HEIGHT
+
+    love.graphics.setColor(0.33,0.33,0.33)
+    love.graphics.print("Floggers: "..world.avatar.floggers, 0, y)
+    y = y + constants.LINE_HEIGHT
+
+    love.graphics.setColor(0.66,0,0)
+    love.graphics.print("Potions: "..world.avatar.potions, 0, y)
     y = y + constants.LINE_HEIGHT
 
     y = love.graphics.getHeight() - constants.MESSAGE_LINE_HEIGHT

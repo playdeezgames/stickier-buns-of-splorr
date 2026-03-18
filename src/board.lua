@@ -47,6 +47,11 @@ local function hilite()
         end
     end
 end
+local function spawnPawns()
+    for _ = 1, constants.PAWN_COUNT do
+        spawnToken(tokens.PAWN)
+    end
+end
 function M.initialize()
     world = {}
     world.messages = {}
@@ -69,15 +74,14 @@ function M.initialize()
         armour = 5,
         jools = 0,
         floggers = 0,
-        sprays = 0
+        sprays = 0,
+        potions = 0
     }
     world.board[world.avatar.x][world.avatar.y].token = tokens.KNIGHT
     hilite()
     spawnToken(tokens.BUN)
     spawnToken(tokens.BUTTHOLE)
-    for _ = 1, constants.PAWN_COUNT do
-        spawnToken(tokens.PAWN)
-    end
+    spawnPawns()
 end
 function M.getWorld()
     return world
@@ -132,13 +136,24 @@ local function checkButthole()
     end
 end
 local function takeDamage(damage)
+    addMessage("You take "..damage.." damage!")
+    local armourCost = 0
+    local healthCost = 0
     while damage > 0 and world.avatar.armour > 0 do
         damage = damage - 1
         world.avatar.armour = world.avatar.armour - 1
+        armourCost = armourCost + 1
     end
     while damage > 0 and world.avatar.health > 0 do
         damage = damage - 1
         world.avatar.health = world.avatar.health - 1
+        healthCost = healthCost + 1
+    end
+    if armourCost > 0 then
+        addMessage("-"..armourCost.." armour!")
+    end
+    if healthCost > 0 then
+        addMessage("-"..healthCost.." health!")
     end
 end
 local function getPawnCount()
@@ -160,6 +175,10 @@ local function attackPawn()
     if getPawnCount() == 0 then
         spawnBishop()
     end
+end
+local function attackBishop()
+    takeDamage(3)
+    spawnPawns()
 end
 function M.attemptMove(x,y)
     if x < 0 or y < 0 or x >= constants.BOARD_WIDTH or y >= constants.BOARD_HEIGHT then
@@ -188,6 +207,8 @@ function M.attemptMove(x,y)
         spawnToken(tokens.BUTTHOLE)
     elseif token == tokens.PAWN then
         attackPawn()
+    elseif token == tokens.BISHOP then
+        attackBishop()
     end
 end
 return M

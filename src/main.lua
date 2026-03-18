@@ -16,11 +16,14 @@ local darkSprite
 local lightSpriteHilite
 local darkSpriteHilite
 local knightSprite
+local pawnSprite
 local cancelSprite
 local bunSprite
 local buttholeSprite
+local font
 
 function love.load(args)
+    font = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.FONT_SIZE)
     bunSprite = sprite.create(love.graphics.newImage("assets/images/bun.png"),40,-20)
     buttholeSprite = sprite.create(love.graphics.newImage("assets/images/butthole.png"),40,20)
     cancelSprite = sprite.create(love.graphics.newImage("assets/images/cancel.png"),40,20)
@@ -30,6 +33,7 @@ function love.load(args)
     darkSpriteHilite = sprite.create(love.graphics.newImage("assets/images/darktilehilite.png"),0,0)
     cursorSprite = sprite.create(love.graphics.newImage("assets/images/cursor.png"),0,0)
     knightSprite = sprite.create(love.graphics.newImage("assets/images/knight.png"),40,-30)
+    pawnSprite = sprite.create(love.graphics.newImage("assets/images/pawn.png"),40,-30)
     mousemap.load()
     board.initialize()
 end
@@ -39,6 +43,7 @@ local function plotXY(x,y)
 end
 
 function love.draw()
+    love.graphics.setColor(255,255,255)
     local world = board.getWorld()
     for x = 0, constants.BOARD_WIDTH - 1 do
         for y = 0, constants.BOARD_HEIGHT - 1 do
@@ -71,11 +76,30 @@ function love.draw()
                 bunSprite:draw(plotX, plotY)
             elseif token == tokens.BUTTHOLE then
                 buttholeSprite:draw(plotX, plotY)
+            elseif token == tokens.PAWN then
+                pawnSprite:draw(plotX, plotY)
             end
         end
     end
-    love.graphics.print("Buns: "..world.avatar.buns.."/"..world.avatar.maximumBuns, 0, 10)
-    love.graphics.print("Health: "..world.avatar.health.."/"..world.avatar.maximumHealth, 0, 25)
+    love.graphics.setFont(font)
+    local y = 0
+
+    love.graphics.setColor(0.66,0,0.66)
+    love.graphics.print("Buns: "..world.avatar.buns.."/"..world.avatar.maximumBuns, 0, y)
+    y = y + constants.LINE_HEIGHT
+
+    love.graphics.setColor(0.66,0,0)
+    love.graphics.print("Health: "..world.avatar.health.."/"..world.avatar.maximumHealth, 0, y)
+    y = y + constants.LINE_HEIGHT
+
+    love.graphics.setColor(0.33,1,0)
+    love.graphics.print("Jools: "..world.avatar.jools, 0, y)
+    y = y + constants.LINE_HEIGHT
+
+    love.graphics.setColor(1,1,0.33)
+    love.graphics.print("Armour: "..world.avatar.armour, 0, y)
+    y = y + constants.LINE_HEIGHT
+
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
@@ -94,6 +118,7 @@ end
 --https://game-icons.net/1x1/sbed/flake.html
 --https://game-icons.net/1x1/sbed/cancel.html
 --https://game-icons.net/1x1/caro-asercion/dumpling-bao.html
+--https://ninjikin.itch.io/font-antiquity-script
 
 --https://game-icons.net/1x1/skoll/spiked-bat.html
 --https://game-icons.net/1x1/delapouite/wood-club.html

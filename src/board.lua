@@ -1,6 +1,7 @@
 local M = {}
 local constants = require("constants")
 local tokens = require("tokens")
+local butthole = require("butthole")
 local world = {}
 local deltas = {
     {x=-2,y=-1},
@@ -63,12 +64,19 @@ function M.initialize()
         buns = 15,
         maximumBuns = 15,
         health = 3,
-        maximumHealth = 3
+        maximumHealth = 3,
+        armour = 0,
+        jools = 0,
+        floggers = 0,
+        sprays = 0
     }
     world.board[world.avatar.x][world.avatar.y].token = tokens.KNIGHT
     hilite()
     spawnToken(tokens.BUN)
     spawnToken(tokens.BUTTHOLE)
+    for _ = 1, constants.PAWN_COUNT do
+        spawnToken(tokens.PAWN)
+    end
 end
 function M.getWorld()
     return world
@@ -95,6 +103,21 @@ local function starve()
         changeHealth(-1)
     end
 end
+local function checkButthole()
+    local result = butthole.check()
+    if result == butthole.NOTHING then
+    elseif result == butthole.JOOLS then
+        world.avatar.jools = world.avatar.jools + 3 + love.math.random(1,3) + love.math.random(1,3)
+    elseif result == butthole.TRAP then
+    elseif result == butthole.TELEPORT then
+    elseif result == butthole.ARMOUR then
+        world.avatar.armour = world.avatar.armour + 1
+    elseif result == butthole.FLOGGER then
+        world.avatar.floggers = world.avatar.floggers + 1
+    elseif result == butthole.POTION then
+        world.avatar.potions = world.avatar.potions + 1
+    end
+end
 function M.attemptMove(x,y)
     if x < 0 or y < 0 or x >= constants.BOARD_WIDTH or y >= constants.BOARD_HEIGHT then
         return
@@ -117,6 +140,7 @@ function M.attemptMove(x,y)
         spawnToken(tokens.BUN)
         changeBuns(5)
     elseif token == tokens.BUTTHOLE then
+        checkButthole()
         spawnToken(tokens.BUTTHOLE)
     end
 end

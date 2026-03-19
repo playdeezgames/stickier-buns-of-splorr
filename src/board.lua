@@ -71,9 +71,9 @@ function M.initialize()
         maximumBuns = 15,
         health = 3,
         maximumHealth = 3,
-        armour = 5,
+        armour = 15,
         jools = 0,
-        floggers = 0,
+        floggers = 1,
         sprays = 0,
         potions = 0
     }
@@ -177,7 +177,12 @@ local function attackPawn()
     end
 end
 local function attackBishop()
-    takeDamage(3)
+    if world.avatar.floggers > 0 then
+        addMessage("-1 flogger!")
+        world.avatar.floggers = world.avatar.floggers - 1
+    else
+        takeDamage(3)
+    end
     spawnPawns()
 end
 function M.attemptMove(x,y)

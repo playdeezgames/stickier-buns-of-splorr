@@ -46,9 +46,8 @@ local function plotXY(x,y)
     return scroller.toScreen((x - y) * (constants.TILE_WIDTH / 2), (x + y) * (constants.TILE_HEIGHT / 2))
 end
 
-function love.draw()
+local function drawBoard(world)
     love.graphics.setColor(255,255,255)
-    local world = board.getWorld()
     for x = 0, constants.BOARD_WIDTH - 1 do
         for y = 0, constants.BOARD_HEIGHT - 1 do
             local cell = world.board[x][y]
@@ -87,6 +86,9 @@ function love.draw()
             end
         end
     end
+end
+
+local function drawStats(world)
     love.graphics.setFont(font)
     local y = 0
 
@@ -113,14 +115,23 @@ function love.draw()
     love.graphics.setColor(0.66,0,0)
     love.graphics.print("Potions: "..world.avatar.potions, 0, y)
     y = y + constants.LINE_HEIGHT
+end
 
-    y = love.graphics.getHeight() - constants.MESSAGE_LINE_HEIGHT
+local function drawMessages(world)
+    local y = love.graphics.getHeight() - constants.MESSAGE_LINE_HEIGHT
     love.graphics.setColor(1,1,1)
     love.graphics.setFont(messageFont)
     for _, v in ipairs(world.messages) do
         love.graphics.print(v,0,y)
         y = y - constants.MESSAGE_LINE_HEIGHT
     end
+end
+
+function love.draw()
+    local world = board.getWorld()
+    drawBoard(world)
+    drawStats(world)
+    drawMessages(world)
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)

@@ -21,12 +21,18 @@ local bishopSprite
 local cancelSprite
 local bunSprite
 local buttholeSprite
+local lotionSprite
+local lotionHoverSprite
 local font
 local messageFont
+local toolTip = ""
+local hoverLotion = false
 
 function love.load(args)
     font = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.FONT_SIZE)
     messageFont = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.MESSAGE_FONT_SIZE)
+    lotionSprite = sprite.create(love.graphics.newImage("assets/images/lotion.png"),0,0)
+    lotionHoverSprite = sprite.create(love.graphics.newImage("assets/images/lotionhover.png"),0,0)
     bunSprite = sprite.create(love.graphics.newImage("assets/images/bun.png"),40,-20)
     buttholeSprite = sprite.create(love.graphics.newImage("assets/images/butthole.png"),40,20)
     cancelSprite = sprite.create(love.graphics.newImage("assets/images/cancel.png"),40,20)
@@ -112,8 +118,8 @@ local function drawStats(world)
     love.graphics.print("Floggers: "..world.avatar.floggers, 0, y)
     y = y + constants.LINE_HEIGHT
 
-    love.graphics.setColor(0.66,0,0)
-    love.graphics.print("Potions: "..world.avatar.potions, 0, y)
+    love.graphics.setColor(0.66,0.66,0.66)
+    love.graphics.print("Lotions: "..world.avatar.lotions, 0, y)
     y = y + constants.LINE_HEIGHT
 end
 
@@ -127,21 +133,77 @@ local function drawMessages(world)
     end
 end
 
+local function drawToolTip()
+    local y = 0
+    love.graphics.setColor(1,1,1)
+    love.graphics.setFont(messageFont)
+    local x = love.graphics.getWidth() - messageFont:getWidth(toolTip)
+    love.graphics.print(toolTip, x, y)
+end
+
+local function drawPotionButton(world)
+    if world.avatar.lotions == 0 then
+        return
+    end
+    local sprite = lotionSprite
+    if hoverLotion then
+        sprite = lotionHoverSprite
+    end
+    sprite:draw(constants.LOTION_X, constants.LOTION_Y)
+end
+
 function love.draw()
     local world = board.getWorld()
     drawBoard(world)
     drawStats(world)
     drawMessages(world)
+    drawToolTip()
+    drawPotionButton(world)
+end
+
+local function updateHoverLotion(world,x,y)
+    hoverLotion =(world.avatar.lotions > 0) and (x >= constants.LOTION_X) and (y >= constants.LOTION_Y)
+end
+
+local function updateToolTip(world)
+    if hoverLotion then
+        toolTip = "Use Lotion"
+        return
+    end
+    local token = world.board[cursorX][cursorY].token
+    if token == tokens.BUN then
+        toolTip = "Stickier Buns"
+    elseif token == tokens.BISHOP then
+        toolTip = "Bishop (enemy, for flogging)"
+    elseif token == tokens.BUTTHOLE then
+        toolTip = "Butthole (for checking)"
+    elseif token == tokens.CANCEL then
+        toolTip = "YOU! SHALL NOT! PASS!"
+    elseif token == tokens.KNIGHT then
+        toolTip = "Knight (you)"
+    elseif token == tokens.PAWN then
+        toolTip = "Pawn (enemy)"
+    else
+        toolTip = ""
+    end
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
+    local world = board.getWorld()
+    updateHoverLotion(world,x,y)
     cursorX, cursorY = mousemap.mapXY(x,y)
-    --TODO: update tooltip
+    updateToolTip(world)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
+    local world = board.getWorld()
+    updateHoverLotion(world,x,y)
     cursorX, cursorY = mousemap.mapXY(x,y)
-    board.attemptMove(cursorX, cursorY)
+    if hoverLotion then
+        board.useLotion()
+    else
+        board.attemptMove(cursorX, cursorY)
+    end
 end
 --80x80
 --https://game-icons.net/1x1/skoll/chess-knight.html
@@ -151,9 +213,20 @@ end
 --https://game-icons.net/1x1/sbed/cancel.html
 --https://game-icons.net/1x1/caro-asercion/dumpling-bao.html
 --https://ninjikin.itch.io/font-antiquity-script
+--https://game-icons.net/1x1/delapouite/liquid-soap.html
 
 --https://game-icons.net/1x1/skoll/spiked-bat.html
 --https://game-icons.net/1x1/delapouite/wood-club.html
 --https://game-icons.net/1x1/delapouite/flanged-mace.html
 
 --7z a -tzip -r ..\stickier.love *
+
+--TODO:
+--indicate knight has died
+--shoppe
+--restart game
+--xp and xp levels
+--trap spray
+--traps
+--teleports
+--streak?

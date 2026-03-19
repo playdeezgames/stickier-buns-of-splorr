@@ -19,13 +19,16 @@ end
 local function placeToken(x,y,token)
     world.board[x][y].token = token
 end
+local function getToken(x,y)
+    return world.board[x][y].token
+end
 local function spawnToken(token)
     local x
     local y
     repeat
         x = love.math.random(0, constants.BOARD_WIDTH - 1)
         y = love.math.random(0, constants.BOARD_HEIGHT - 1)
-    until world.board[x][y].token == nil
+    until getToken(x,y) == nil
     placeToken(x,y,token)
 end
 local function unhilite()
@@ -52,6 +55,10 @@ local function spawnPawns()
         spawnToken(tokens.PAWN)
     end
 end
+local function placeAvatar()
+    placeToken(world.avatar.x,world.avatar.y,tokens.KNIGHT)
+end
+
 function M.initialize()
     world = {}
     world.messages = {}
@@ -71,13 +78,13 @@ function M.initialize()
         maximumBuns = 15,
         health = 3,
         maximumHealth = 3,
-        armour = 15,
+        armour = 5,
         jools = 0,
-        floggers = 1,
+        floggers = 0,
         sprays = 0,
-        potions = 0
+        lotions = 0
     }
-    world.board[world.avatar.x][world.avatar.y].token = tokens.KNIGHT
+    placeAvatar()
     hilite()
     spawnToken(tokens.BUN)
     spawnToken(tokens.BUTTHOLE)
@@ -95,8 +102,8 @@ end
 local function uncancel()
     for x = 0, constants.BOARD_WIDTH - 1 do
         for y = 0, constants.BOARD_HEIGHT - 1 do
-            if world.board[x][y].token == tokens.CANCEL then
-                world.board[x][y].token = nil
+            if getToken(x,y) == tokens.CANCEL then
+                placeToken(x, y, nil)
             end
         end
     end
@@ -130,9 +137,9 @@ local function checkButthole()
     elseif result == butthole.FLOGGER then
         world.avatar.floggers = world.avatar.floggers + 1
         addMessage("+1 Flogger!")
-    elseif result == butthole.POTION then
-        world.avatar.potions = world.avatar.potions + 1
-        addMessage("+1 Potion!")
+    elseif result == butthole.LOTION then
+        world.avatar.lotions = world.avatar.lotions + 1
+        addMessage("+1 lotion!")
     end
 end
 local function takeDamage(damage)
@@ -155,12 +162,15 @@ local function takeDamage(damage)
     if healthCost > 0 then
         addMessage("-"..healthCost.." health!")
     end
+    if world.avatar.health <= 0 then
+        unhilite()
+    end
 end
 local function getPawnCount()
     local result = 0
     for x = 0, constants.BOARD_WIDTH - 1 do
         for y = 0 , constants.BOARD_HEIGHT - 1 do
-            if world.board[x][y].token == tokens.PAWN then
+            if getToken(x,y) == tokens.PAWN then
                 result = result + 1
             end
         end
@@ -196,11 +206,11 @@ function M.attemptMove(x,y)
     starve()
     uncancel()
     local cancelX, cancelY = world.avatar.x, world.avatar.y
-    world.board[cancelX][cancelY].token = tokens.CANCEL
-    local token = world.board[x][y].token
+    placeToken(cancelX,cancelY,tokens.CANCEL)
+    local token = getToken(x,y)
     world.avatar.x = x
     world.avatar.y = y
-    world.board[world.avatar.x][world.avatar.y].token = tokens.KNIGHT
+    placeAvatar()
     hilite()
     world.board[cancelX][cancelY].hilite = false
     if token == tokens.BUN then
@@ -215,5 +225,15 @@ function M.attemptMove(x,y)
     elseif token == tokens.BISHOP then
         attackBishop()
     end
+end
+function M.useLotion()
+    if world.avatar.lotions <= 0 then
+        return
+    end
+    world.avatar.lotions = world.avatar.lotions - 1
+    local healing = world.avatar.maximumHealth - world.avatar.health
+    world.avatar.health = world.avatar.maximumHealth
+    addMessage("-1 lotion")
+    addMessage("+"..healing.." health")
 end
 return M

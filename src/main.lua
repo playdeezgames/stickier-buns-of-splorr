@@ -152,6 +152,17 @@ local function drawPotionButton(world)
     sprite:draw(constants.LOTION_X, constants.LOTION_Y)
 end
 
+local function drawYerDead(world)
+    if world.avatar.health <=0 then
+        local text = "Yer Dead!"
+        local y = (love.graphics.getHeight() - font:getHeight())/2
+        local x = (love.graphics.getWidth() - font:getWidth(text)) / 2
+        love.graphics.setColor(1,0,0)
+        love.graphics.setFont(font)
+        love.graphics.print(text,x,y)
+    end
+end
+
 function love.draw()
     local world = board.getWorld()
     drawBoard(world)
@@ -159,6 +170,7 @@ function love.draw()
     drawMessages(world)
     drawToolTip()
     drawPotionButton(world)
+    drawYerDead(world)
 end
 
 local function updateHoverLotion(world,x,y)

@@ -5,19 +5,21 @@ local board = require("board")
 local mousemap = require("mousemap")
 local constants = require("constants")
 local scroller = require("scroller")
-local sprite = require("sprite")
 local tokens = require("tokens")
 local statemachine = require("statemachine")
 local spritemanager = require("spritemanager")
 local sprites = require("sprites")
+local uimanager = require("uimanager")
 
-local cursorX = 0
-local cursorY = 0
+--TODO: font manager?
 local font
 local messageFont
+
+--TODO: ui manager?
+local cursorX = 0
+local cursorY = 0
 local toolTip = ""
 local hoverLotion = false
-
 
 local machine
 function love.load(args)

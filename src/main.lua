@@ -18,7 +18,6 @@ local messageFont
 --TODO: ui manager?
 local cursorX = 0
 local cursorY = 0
-local toolTip = ""
 
 local machine
 function love.load(args)
@@ -121,8 +120,8 @@ local function drawToolTip()
     local y = 0
     love.graphics.setColor(1,1,1)
     love.graphics.setFont(messageFont)
-    local x = love.graphics.getWidth() - messageFont:getWidth(toolTip)
-    love.graphics.print(toolTip, x, y)
+    local x = love.graphics.getWidth() - messageFont:getWidth(uimanager.getToolTip())
+    love.graphics.print(uimanager.getToolTip(), x, y)
 end
 
 local function drawPotionButton(world)
@@ -165,24 +164,24 @@ end
 
 local function updateToolTip(world)
     if uimanager.getHoverLotion() then
-        toolTip = "Use Lotion"
+        uimanager.setToolTip("Use Lotion")
         return
     end
     local token = world.board[cursorX][cursorY].token
     if token == tokens.BUN then
-        toolTip = "Stickier Buns"
+        uimanager.setToolTip("Stickier Buns")
     elseif token == tokens.BISHOP then
-        toolTip = "Bishop (enemy, for flogging)"
+        uimanager.setToolTip("Bishop (enemy, for flogging)")
     elseif token == tokens.BUTTHOLE then
-        toolTip = "Butthole (for checking)"
+        uimanager.setToolTip("Butthole (for checking)")
     elseif token == tokens.CANCEL then
-        toolTip = "YOU! SHALL NOT! PASS!"
+        uimanager.setToolTip("YOU! SHALL NOT! PASS!")
     elseif token == tokens.KNIGHT then
-        toolTip = "Knight (you)"
+        uimanager.setToolTip("Knight (you)")
     elseif token == tokens.PAWN then
-        toolTip = "Pawn (enemy)"
+        uimanager.setToolTip("Pawn (enemy)")
     else
-        toolTip = ""
+        uimanager.setToolTip("")
     end
 end
 

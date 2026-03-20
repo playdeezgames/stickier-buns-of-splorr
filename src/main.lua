@@ -15,10 +15,6 @@ local uimanager = require("uimanager")
 local font
 local messageFont
 
---TODO: ui manager?
-local cursorX = 0
-local cursorY = 0
-
 local machine
 function love.load(args)
     spritemanager.load()
@@ -56,6 +52,7 @@ local function drawBoard(world)
             end
             local plotX, plotY = plotXY(x,y)
             which:draw(plotX,plotY)
+            local cursorX, cursorY = uimanager.getCursorXY()
             if x == cursorX and y == cursorY then
                 spritemanager.getSprite(sprites.CURSOR):draw(plotX, plotY)
             end
@@ -167,6 +164,7 @@ local function updateToolTip(world)
         uimanager.setToolTip("Use Lotion")
         return
     end
+    local cursorX, cursorY = uimanager.getCursorXY()
     local token = world.board[cursorX][cursorY].token
     if token == tokens.BUN then
         uimanager.setToolTip("Stickier Buns")
@@ -190,7 +188,8 @@ function love.mousemoved(x, y, dx, dy, istouch)
 
     local world = board.getWorld()
     updateHoverLotion(world,x,y)
-    cursorX, cursorY = mousemap.mapXY(x,y)
+    local cursorX, cursorY = mousemap.mapXY(x,y)
+    uimanager.setCursorXY(cursorX, cursorY)
     updateToolTip(world)
 end
 
@@ -199,7 +198,8 @@ function love.mousepressed(x, y, button, istouch, presses)
 
     local world = board.getWorld()
     updateHoverLotion(world,x,y)
-    cursorX, cursorY = mousemap.mapXY(x,y)
+    local cursorX, cursorY = mousemap.mapXY(x,y)
+    uimanager.setCursorXY(cursorX, cursorY)
     if uimanager.getHoverLotion() then
         board.useLotion()
     else

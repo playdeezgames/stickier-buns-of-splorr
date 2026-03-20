@@ -2,7 +2,6 @@ if arg[#arg] == "debug" then
     require("lldebugger").start()
 end
 local board = require("board")
-local mousemap = require("mousemap")
 local constants = require("constants")
 local scroller = require("scroller")
 local tokens = require("tokens")
@@ -18,12 +17,13 @@ local messageFont
 local machine
 function love.load(args)
     spritemanager.load()
+    uimanager.load()
     machine = statemachine.create()
     machine:load()
 
     font = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.FONT_SIZE)
     messageFont = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.MESSAGE_FONT_SIZE)
-    mousemap.load()
+
     board.initialize()
 end
 
@@ -188,8 +188,7 @@ function love.mousemoved(x, y, dx, dy, istouch)
 
     local world = board.getWorld()
     updateHoverLotion(world,x,y)
-    local cursorX, cursorY = mousemap.mapXY(x,y)
-    uimanager.setCursorXY(cursorX, cursorY)
+    uimanager.mapXY(x,y)
     updateToolTip(world)
 end
 
@@ -198,12 +197,11 @@ function love.mousepressed(x, y, button, istouch, presses)
 
     local world = board.getWorld()
     updateHoverLotion(world,x,y)
-    local cursorX, cursorY = mousemap.mapXY(x,y)
-    uimanager.setCursorXY(cursorX, cursorY)
+    uimanager.mapXY(x,y)
     if uimanager.getHoverLotion() then
         board.useLotion()
     else
-        board.attemptMove(cursorX, cursorY)
+        board.attemptMove(uimanager.getCursorXY())
     end
 end
 --https://game-icons.net/1x1/skoll/chess-knight.html

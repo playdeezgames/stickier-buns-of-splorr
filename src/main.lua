@@ -13,19 +13,6 @@ local sprites = require("sprites")
 
 local cursorX = 0
 local cursorY = 0
-local cursorSprite
-local lightSprite
-local darkSprite
-local lightSpriteHilite
-local darkSpriteHilite
-local knightSprite
-local pawnSprite
-local bishopSprite
-local cancelSprite
-local bunSprite
-local buttholeSprite
-local lotionSprite
-local lotionHoverSprite
 local font
 local messageFont
 local toolTip = ""
@@ -34,24 +21,12 @@ local hoverLotion = false
 
 local machine
 function love.load(args)
+    spritemanager.load()
     machine = statemachine.create()
     machine:load()
 
     font = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.FONT_SIZE)
     messageFont = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.MESSAGE_FONT_SIZE)
-    lotionSprite = sprite.create(love.graphics.newImage("assets/images/lotion.png"),0,0)
-    lotionHoverSprite = sprite.create(love.graphics.newImage("assets/images/lotionhover.png"),0,0)
-    bunSprite = sprite.create(love.graphics.newImage("assets/images/bun.png"),40,-20)
-    buttholeSprite = sprite.create(love.graphics.newImage("assets/images/butthole.png"),40,20)
-    cancelSprite = sprite.create(love.graphics.newImage("assets/images/cancel.png"),40,20)
-    lightSprite = sprite.create(love.graphics.newImage("assets/images/lighttile.png"),0,0)
-    darkSprite = sprite.create(love.graphics.newImage("assets/images/darktile.png"),0,0)
-    lightSpriteHilite = sprite.create(love.graphics.newImage("assets/images/lighttilehilite.png"),0,0)
-    darkSpriteHilite = sprite.create(love.graphics.newImage("assets/images/darktilehilite.png"),0,0)
-    cursorSprite = sprite.create(love.graphics.newImage("assets/images/cursor.png"),0,0)
-    knightSprite = sprite.create(love.graphics.newImage("assets/images/knight.png"),40,-30)
-    pawnSprite = sprite.create(love.graphics.newImage("assets/images/pawn.png"),40,-30)
-    bishopSprite = sprite.create(love.graphics.newImage("assets/images/bishop.png"),40,-30)
     mousemap.load()
     board.initialize()
 end
@@ -68,35 +43,35 @@ local function drawBoard(world)
             local which
             if cell.light then
                 if cell.hilite then
-                    which = lightSpriteHilite
+                    which = spritemanager.getSprite(sprites.LIGHT_HILITE)
                 else
-                    which = lightSprite
+                    which = spritemanager.getSprite(sprites.LIGHT)
                 end
             else
                 if cell.hilite then
-                    which = darkSpriteHilite
+                    which = spritemanager.getSprite(sprites.DARK_HILITE)
                 else
-                    which = darkSprite
+                    which = spritemanager.getSprite(sprites.DARK)
                 end
             end
             local plotX, plotY = plotXY(x,y)
             which:draw(plotX,plotY)
             if x == cursorX and y == cursorY then
-                cursorSprite:draw(plotX, plotY)
+                spritemanager.getSprite(sprites.CURSOR):draw(plotX, plotY)
             end
             local token = cell.token
             if token == tokens.KNIGHT then
-                knightSprite:draw(plotX, plotY)
+                spritemanager.getSprite(sprites.KNIGHT):draw(plotX, plotY)
             elseif token == tokens.CANCEL then
-                cancelSprite:draw(plotX, plotY)
+                spritemanager.getSprite(sprites.CANCEL):draw(plotX, plotY)
             elseif token == tokens.BUN then
-                bunSprite:draw(plotX, plotY)
+                spritemanager.getSprite(sprites.BUN):draw(plotX, plotY)
             elseif token == tokens.BUTTHOLE then
-                buttholeSprite:draw(plotX, plotY)
+                spritemanager.getSprite(sprites.BUTTHOLE):draw(plotX, plotY)
             elseif token == tokens.PAWN then
-                pawnSprite:draw(plotX, plotY)
+                spritemanager.getSprite(sprites.PAWN):draw(plotX, plotY)
             elseif token == tokens.BISHOP then
-                bishopSprite:draw(plotX, plotY)
+                spritemanager.getSprite(sprites.BISHOP):draw(plotX, plotY)
             end
         end
     end
@@ -153,9 +128,9 @@ local function drawPotionButton(world)
     if world.avatar.lotions == 0 then
         return
     end
-    local sprite = lotionSprite
+    local sprite = spritemanager.getSprite(sprites.LOTION)
     if hoverLotion then
-        sprite = lotionHoverSprite
+        sprite = spritemanager.getSprite(sprites.LOTION_HOVER)
     end
     sprite:draw(constants.LOTION_X, constants.LOTION_Y)
 end

@@ -7,6 +7,7 @@ local constants = require("constants")
 local scroller = require("scroller")
 local sprite = require("sprite")
 local tokens = require("tokens")
+local statemachine = require("statemachine")
 
 local cursorX = 0
 local cursorY = 0
@@ -28,7 +29,12 @@ local messageFont
 local toolTip = ""
 local hoverLotion = false
 
+
+local machine
 function love.load(args)
+    machine = statemachine.create()
+    machine:load()
+
     font = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.FONT_SIZE)
     messageFont = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.MESSAGE_FONT_SIZE)
     lotionSprite = sprite.create(love.graphics.newImage("assets/images/lotion.png"),0,0)
@@ -164,6 +170,8 @@ local function drawYerDead(world)
 end
 
 function love.draw()
+    machine:draw()
+
     local world = board.getWorld()
     drawBoard(world)
     drawStats(world)
@@ -201,6 +209,8 @@ local function updateToolTip(world)
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
+    machine:mousemoved(x,y,dx,dy,istouch)
+
     local world = board.getWorld()
     updateHoverLotion(world,x,y)
     cursorX, cursorY = mousemap.mapXY(x,y)
@@ -208,6 +218,8 @@ function love.mousemoved(x, y, dx, dy, istouch)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
+    machine:mousepressed(x,y,button,istouch,presses)
+    
     local world = board.getWorld()
     updateHoverLotion(world,x,y)
     cursorX, cursorY = mousemap.mapXY(x,y)
@@ -217,7 +229,6 @@ function love.mousepressed(x, y, button, istouch, presses)
         board.attemptMove(cursorX, cursorY)
     end
 end
---80x80
 --https://game-icons.net/1x1/skoll/chess-knight.html
 --https://game-icons.net/1x1/skoll/chess-bishop.html
 --https://game-icons.net/1x1/skoll/chess-pawn.html
@@ -234,9 +245,8 @@ end
 --7z a -tzip -r ..\stickier.love *
 
 --TODO:
---indicate knight has died
---shoppe
 --restart game
+--shoppe
 --xp and xp levels
 --trap spray
 --traps

@@ -3,7 +3,6 @@ if arg[#arg] == "debug" then
 end
 local board = require("board")
 local constants = require("constants")
-local scroller = require("scroller")
 local tokens = require("tokens")
 local statemachine = require("statemachine")
 local spritemanager = require("spritemanager")
@@ -27,10 +26,6 @@ function love.load(args)
     board.initialize()
 end
 
-local function plotXY(x,y)
-    return scroller.toScreen((x - y) * (constants.TILE_WIDTH / 2), (x + y) * (constants.TILE_HEIGHT / 2))
-end
-
 local function drawBoard(world)
     love.graphics.setColor(255,255,255)
     for x = 0, constants.BOARD_WIDTH - 1 do
@@ -50,7 +45,7 @@ local function drawBoard(world)
                     which = spritemanager.getSprite(sprites.DARK)
                 end
             end
-            local plotX, plotY = plotXY(x,y)
+            local plotX, plotY = uimanager.plotXY(x,y)
             which:draw(plotX,plotY)
             local cursorX, cursorY = uimanager.getCursorXY()
             if x == cursorX and y == cursorY then

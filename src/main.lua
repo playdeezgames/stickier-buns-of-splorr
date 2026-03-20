@@ -19,7 +19,6 @@ local messageFont
 local cursorX = 0
 local cursorY = 0
 local toolTip = ""
-local hoverLotion = false
 
 local machine
 function love.load(args)
@@ -131,7 +130,7 @@ local function drawPotionButton(world)
         return
     end
     local sprite = spritemanager.getSprite(sprites.LOTION)
-    if hoverLotion then
+    if uimanager.getHoverLotion() then
         sprite = spritemanager.getSprite(sprites.LOTION_HOVER)
     end
     sprite:draw(constants.LOTION_X, constants.LOTION_Y)
@@ -161,11 +160,11 @@ function love.draw()
 end
 
 local function updateHoverLotion(world,x,y)
-    hoverLotion =(world.avatar.lotions > 0) and (x >= constants.LOTION_X) and (y >= constants.LOTION_Y)
+    uimanager.setHoverLotion((world.avatar.lotions > 0) and (x >= constants.LOTION_X) and (y >= constants.LOTION_Y))
 end
 
 local function updateToolTip(world)
-    if hoverLotion then
+    if uimanager.getHoverLotion() then
         toolTip = "Use Lotion"
         return
     end
@@ -202,7 +201,7 @@ function love.mousepressed(x, y, button, istouch, presses)
     local world = board.getWorld()
     updateHoverLotion(world,x,y)
     cursorX, cursorY = mousemap.mapXY(x,y)
-    if hoverLotion then
+    if uimanager.getHoverLotion() then
         board.useLotion()
     else
         board.attemptMove(cursorX, cursorY)

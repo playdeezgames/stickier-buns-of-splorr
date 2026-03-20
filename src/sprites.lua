@@ -1,0 +1,15 @@
+local M = {}
+M.BISHOP = "bishop"
+M.BUN = "bun"
+M.BUTTHOLE = "butthole"
+M.CANCEL = "cancel"
+M.CURSOR = "cursor"
+M.DARK = "dark"
+M.DARK_HILITE = "dark hilite"
+M.LIGHT = "light"
+M.LOTION = "lotion"
+M.LOTION_HOVER = "lotion hover"
+M.LIGHT_HILITE = "light hilite"
+M.KNIGHT = "knight"
+M.PAWN = "pawn"
+return M

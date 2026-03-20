@@ -8,6 +8,8 @@ local scroller = require("scroller")
 local sprite = require("sprite")
 local tokens = require("tokens")
 local statemachine = require("statemachine")
+local spritemanager = require("spritemanager")
+local sprites = require("sprites")
 
 local cursorX = 0
 local cursorY = 0
@@ -219,7 +221,7 @@ end
 
 function love.mousepressed(x, y, button, istouch, presses)
     machine:mousepressed(x,y,button,istouch,presses)
-    
+
     local world = board.getWorld()
     updateHoverLotion(world,x,y)
     cursorX, cursorY = mousemap.mapXY(x,y)

@@ -1,6 +1,7 @@
 if arg[#arg] == "debug" then
     require("lldebugger").start()
 end
+local fonts = require "fonts"
 local board = require("board")
 local constants = require("constants")
 local tokens = require("tokens")
@@ -8,21 +9,15 @@ local statemachine = require("statemachine")
 local spritemanager = require("spritemanager")
 local sprites = require("sprites")
 local uimanager = require("uimanager")
-
---TODO: font manager?
-local font
-local messageFont
+local fontmanager = require("fontmanager")
 
 local machine
 function love.load(args)
     spritemanager.load()
+    fontmanager.load()
     uimanager.load()
     machine = statemachine.create()
     machine:load()
-
-    font = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.FONT_SIZE)
-    messageFont = love.graphics.newFont("assets/fonts/antiquity-print.ttf", constants.MESSAGE_FONT_SIZE)
-
     board.initialize()
 end
 
@@ -70,7 +65,7 @@ local function drawBoard(world)
 end
 
 local function drawStats(world)
-    love.graphics.setFont(font)
+    love.graphics.setFont(fontmanager.getFont(fonts.STATISTICS))
     local y = 0
 
     love.graphics.setColor(0.66,0,0.66)
@@ -101,7 +96,7 @@ end
 local function drawMessages(world)
     local y = love.graphics.getHeight() - constants.MESSAGE_LINE_HEIGHT
     love.graphics.setColor(1,1,1)
-    love.graphics.setFont(messageFont)
+    love.graphics.setFont(fontmanager.getFont(fonts.MESSAGE))
     for _, v in ipairs(world.messages) do
         love.graphics.print(v,0,y)
         y = y - constants.MESSAGE_LINE_HEIGHT
@@ -111,8 +106,8 @@ end
 local function drawToolTip()
     local y = 0
     love.graphics.setColor(1,1,1)
-    love.graphics.setFont(messageFont)
-    local x = love.graphics.getWidth() - messageFont:getWidth(uimanager.getToolTip())
+    love.graphics.setFont(fontmanager.getFont(fonts.MESSAGE))
+    local x = love.graphics.getWidth() - fontmanager.getFont(fonts.MESSAGE):getWidth(uimanager.getToolTip())
     love.graphics.print(uimanager.getToolTip(), x, y)
 end
 
@@ -130,10 +125,10 @@ end
 local function drawYerDead(world)
     if world.avatar.health <=0 then
         local text = "Yer Dead!"
-        local y = (love.graphics.getHeight() - font:getHeight())/2
-        local x = (love.graphics.getWidth() - font:getWidth(text)) / 2
+        local y = (love.graphics.getHeight() - fontmanager.getFont(fonts.STATISTICS):getHeight())/2
+        local x = (love.graphics.getWidth() - fontmanager.getFont(fonts.STATISTICS):getWidth(text)) / 2
         love.graphics.setColor(1,0,0)
-        love.graphics.setFont(font)
+        love.graphics.setFont(fontmanager.getFont(fonts.STATISTICS))
         love.graphics.print(text,x,y)
     end
 end

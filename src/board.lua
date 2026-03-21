@@ -82,7 +82,7 @@ function M.initialize()
         jools = 0,
         floggers = 0,
         sprays = 0,
-        lotions = 0
+        lotions = 1
     }
     placeAvatar()
     hilite()

@@ -11,11 +11,14 @@ local sprites = require("sprites")
 local uimanager = require("uimanager")
 local fontmanager = require("fontmanager")
 local tokenmanager = require("tokenmanager")
+local buttons = require("buttons")
+local buttonmanager = require("buttonmanager")
 
 local machine
 function love.load(args)
     spritemanager.load()
     fontmanager.load()
+    buttonmanager.load()
     uimanager.load()
     tokenmanager.load()
     machine = statemachine.create()
@@ -105,7 +108,8 @@ local function drawMessages(world)
     end
 end
 
-local function drawToolTip()
+local function drawToolTip(world)
+    --TODO: if we are hovering over a button, show THAT instead of token tooltip
     local y = 0
     love.graphics.setColor(1,1,1)
     love.graphics.setFont(fontmanager.getFont(fonts.MESSAGE))
@@ -121,7 +125,7 @@ local function drawPotionButton(world)
     if uimanager.getHoverLotion() then
         sprite = spritemanager.getSprite(sprites.LOTION_HOVER)
     end
-    sprite:draw(constants.LOTION_X, constants.LOTION_Y)
+    sprite:draw(constants.USE_LOTION_X, constants.USE_LOTION_Y)
 end
 
 local function drawYerDead(world)
@@ -135,6 +139,9 @@ local function drawYerDead(world)
     end
 end
 
+local function drawButtons(world)
+end
+
 function love.draw()
     machine:draw()
 
@@ -142,13 +149,14 @@ function love.draw()
     drawBoard(world)
     drawStats(world)
     drawMessages(world)
-    drawToolTip()
+    drawToolTip(world)
+    drawButtons(world)
     drawPotionButton(world)
     drawYerDead(world)
 end
 
 local function updateHoverLotion(world,x,y)
-    uimanager.setHoverLotion((world.avatar.lotions > 0) and (x >= constants.LOTION_X) and (y >= constants.LOTION_Y))
+    uimanager.setHoverLotion((world.avatar.lotions > 0) and (x >= constants.USE_LOTION_X) and (y >= constants.USE_LOTION_Y))
 end
 
 local function updateToolTip(world)
@@ -204,3 +212,12 @@ end
 --traps
 --teleports
 --streak?
+
+--buttons:
+--use lotion
+--leave shoppe
+--buy lotion
+--buy flogger
+--buy spray
+--buy armor
+--buy supplies

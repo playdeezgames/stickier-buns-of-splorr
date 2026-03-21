@@ -5,7 +5,6 @@ local constants = require("constants")
 local cursorX = 0
 local cursorY = 0
 local toolTip = ""
-local hoverLotion = false
 function M.load()
     mousemap.load()
 end
@@ -20,12 +19,6 @@ function M.setToolTip(text)
 end
 function M.getToolTip()
     return toolTip
-end
-function M.setHoverLotion(state)
-    hoverLotion = state
-end
-function M.getHoverLotion()
-    return hoverLotion
 end
 function M.mapXY(x,y)
     M.setCursorXY(mousemap.mapXY(x,y))

@@ -148,10 +148,6 @@ function love.draw()
     drawYerDead(world)
 end
 
-local function updateHoverLotion(world,x,y)
-    buttonmanager.checkHover(x,y)
-end
-
 local function updateToolTip(world)
     local tooltip = buttonmanager.getToolTip(world)
     if tooltip ~= nil then
@@ -166,7 +162,7 @@ function love.mousemoved(x, y, dx, dy, istouch)
     machine:mousemoved(x,y,dx,dy,istouch)
 
     local world = board.getWorld()
-    updateHoverLotion(world,x,y)
+    buttonmanager.checkHover(x,y)
     uimanager.mapXY(x,y)
     updateToolTip(world)
 end
@@ -174,12 +170,9 @@ end
 function love.mousepressed(x, y, button, istouch, presses)
     machine:mousepressed(x,y,button,istouch,presses)
 
-    local world = board.getWorld()
-    updateHoverLotion(world,x,y)
     uimanager.mapXY(x,y)
-    if uimanager.getHoverLotion() then
-        board.useLotion()
-    else
+    buttonmanager.checkHover(x,y)
+    if not buttonmanager.handleClick(board.getWorld()) then
         board.attemptMove(uimanager.getCursorXY())
     end
 end

@@ -6,16 +6,22 @@ local constants = require("constants")
 local repository = {}
 local tooltips = {}
 local enablers = {}
-local function createButton(buttonid, spriteid, hoverSpriteid, x, y, width, height, tooltip, enabler)
+local handlers = {}
+local function createButton(buttonid, spriteid, hoverSpriteid, x, y, width, height, tooltip, enabler, handler)
     repository[buttonid] = button.create(spriteid, hoverSpriteid, x, y, width, height)
     tooltips[buttonid] = tooltip
     enablers[buttonid] = enabler
+    handlers[buttonid] = handler
 end
 local function isUseLotionEnabled(world)
     return world.avatar.lotions > 0
 end
+local function handleUseLotion(world)
+    world.avatar.lotions = world.avatar.lotions - 1
+    world.avatar.health = world.avatar.maximumHealth
+end
 function M.load()
-    createButton(buttons.USE_LOTION, sprites.LOTION, sprites.LOTION_HOVER, constants.USE_LOTION_X, constants.USE_LOTION_Y, constants.USE_LOTION_WIDTH, constants.USE_LOTION_HEIGHT, "Use Lotion", isUseLotionEnabled)
+    createButton(buttons.USE_LOTION, sprites.LOTION, sprites.LOTION_HOVER, constants.USE_LOTION_X, constants.USE_LOTION_Y, constants.USE_LOTION_WIDTH, constants.USE_LOTION_HEIGHT, "Use Lotion", isUseLotionEnabled, handleUseLotion)
 end
 function M.getButton(buttonid)
     return repository[buttonid]
@@ -47,6 +53,13 @@ end
 function M.update(world)
     for k, v in pairs(repository) do
         v:setEnabled(enablers[k](world))
+    end
+end
+function M.handleClick(world)
+    for k, v in pairs(repository) do
+        if v:isEnabled() and v:getHover() then
+            handlers[k](world)
+        end
     end
 end
 return M

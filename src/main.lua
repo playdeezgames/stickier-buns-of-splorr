@@ -10,12 +10,14 @@ local spritemanager = require("spritemanager")
 local sprites = require("sprites")
 local uimanager = require("uimanager")
 local fontmanager = require("fontmanager")
+local tokenmanager = require("tokenmanager")
 
 local machine
 function love.load(args)
     spritemanager.load()
     fontmanager.load()
     uimanager.load()
+    tokenmanager.load()
     machine = statemachine.create()
     machine:load()
     board.initialize()
@@ -155,22 +157,7 @@ local function updateToolTip(world)
         return
     end
     local cursorX, cursorY = uimanager.getCursorXY()
-    local token = world.board[cursorX][cursorY].token
-    if token == tokens.BUN then
-        uimanager.setToolTip("Stickier Buns")
-    elseif token == tokens.BISHOP then
-        uimanager.setToolTip("Bishop (enemy, for flogging)")
-    elseif token == tokens.BUTTHOLE then
-        uimanager.setToolTip("Butthole (for checking)")
-    elseif token == tokens.CANCEL then
-        uimanager.setToolTip("YOU! SHALL NOT! PASS!")
-    elseif token == tokens.KNIGHT then
-        uimanager.setToolTip("Knight (you)")
-    elseif token == tokens.PAWN then
-        uimanager.setToolTip("Pawn (enemy)")
-    else
-        uimanager.setToolTip("")
-    end
+    uimanager.setToolTip(tokenmanager.getToolTip(world.board[cursorX][cursorY].token))
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)

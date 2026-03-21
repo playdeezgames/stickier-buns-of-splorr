@@ -3,6 +3,7 @@ local button = require("button")
 local buttons = require("buttons")
 local sprites = require("sprites")
 local constants = require("constants")
+local board = require("board")
 local repository = {}
 local tooltips = {}
 local enablers = {}
@@ -17,8 +18,7 @@ local function isUseLotionEnabled(world)
     return world.avatar.lotions > 0
 end
 local function handleUseLotion(world)
-    world.avatar.lotions = world.avatar.lotions - 1
-    world.avatar.health = world.avatar.maximumHealth
+    board.useLotion()
 end
 function M.load()
     createButton(buttons.USE_LOTION, sprites.LOTION, sprites.LOTION_HOVER, constants.USE_LOTION_X, constants.USE_LOTION_Y, constants.USE_LOTION_WIDTH, constants.USE_LOTION_HEIGHT, "Use Lotion", isUseLotionEnabled, handleUseLotion)

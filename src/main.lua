@@ -117,17 +117,6 @@ local function drawToolTip(world)
     love.graphics.print(uimanager.getToolTip(), x, y)
 end
 
-local function drawPotionButton(world)
-    if world.avatar.lotions == 0 then
-        return
-    end
-    local sprite = spritemanager.getSprite(sprites.LOTION)
-    if uimanager.getHoverLotion() then
-        sprite = spritemanager.getSprite(sprites.LOTION_HOVER)
-    end
-    sprite:draw(constants.USE_LOTION_X, constants.USE_LOTION_Y)
-end
-
 local function drawYerDead(world)
     if world.avatar.health <=0 then
         local text = "Yer Dead!"
@@ -139,7 +128,12 @@ local function drawYerDead(world)
     end
 end
 
-local function drawButtons(world)
+local function drawButtons()
+    buttonmanager:draw()
+end
+
+function love.update(dt)
+    buttonmanager.update(board.getWorld())
 end
 
 function love.draw()
@@ -150,18 +144,18 @@ function love.draw()
     drawStats(world)
     drawMessages(world)
     drawToolTip(world)
-    drawButtons(world)
-    drawPotionButton(world)
+    drawButtons()
     drawYerDead(world)
 end
 
 local function updateHoverLotion(world,x,y)
-    uimanager.setHoverLotion((world.avatar.lotions > 0) and (x >= constants.USE_LOTION_X) and (y >= constants.USE_LOTION_Y))
+    buttonmanager.checkHover(x,y)
 end
 
 local function updateToolTip(world)
-    if uimanager.getHoverLotion() then
-        uimanager.setToolTip("Use Lotion")
+    local tooltip = buttonmanager.getToolTip(world)
+    if tooltip ~= nil then
+        uimanager.setToolTip(tooltip)
         return
     end
     local cursorX, cursorY = uimanager.getCursorXY()

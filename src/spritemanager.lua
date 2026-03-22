@@ -23,6 +23,8 @@ function M.load()
     createSprite(sprites.SHOPPE, "assets/images/shoppe.png", 40, -30)
     createSprite(sprites.LEAVE, "assets/images/leave.png", 0, 0)
     createSprite(sprites.LEAVE_HOVER, "assets/images/leavehover.png", 0, 0)
+    createSprite(sprites.UPGRADE_BUNS, "assets/images/upgradebuns.png", 0, 0)
+    createSprite(sprites.UPGRADE_BUNS_HOVER, "assets/images/upgradebunshover.png", 0, 0)
 end
 function M.getSprite(spriteId)
     return repository[spriteId]

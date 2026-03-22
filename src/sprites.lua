@@ -16,4 +16,6 @@ M.LIGHT_HILITE = "light hilite"
 M.KNIGHT = "knight"
 M.PAWN = "pawn"
 M.SHOPPE = "shoppe"
+M.UPGRADE_BUNS = "upgrade buns"
+M.UPGRADE_BUNS_HOVER = "upgrade buns hover"
 return M

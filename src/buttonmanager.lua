@@ -26,6 +26,17 @@ end
 local function handleLeave(world)
     world.avatar.shoppe = false
 end
+local function getUpgradeBunsToolTip(world)
+    --TODO: get upgrade buns price and put it in the tool tip
+    return "Upgrade Buns"
+end
+local function isUpgradeBunsEnabled(world)
+    --TODO: only when i have enough jools for the upgrade
+    return world.avatar.shoppe
+end
+local function handleUpgradeBuns(world)
+    --TODO: upgrade buns
+end
 function M.load()
     createButton(
         buttons.USE_LOTION, 
@@ -49,6 +60,17 @@ function M.load()
         "Leave Shoppe", 
         isLeaveEnabled, 
         handleLeave)
+    createButton(
+        buttons.UPGRADE_BUNS, 
+        sprites.UPGRADE_BUNS, 
+        sprites.UPGRADE_BUNS_HOVER, 
+        constants.UPGRADE_BUNS_X, 
+        constants.UPGRADE_BUNS_Y, 
+        constants.UPGRADE_BUNS_WIDTH, 
+        constants.UPGRADE_BUNS_HEIGHT, 
+        getUpgradeBunsToolTip, 
+        isUpgradeBunsEnabled, 
+        handleUpgradeBuns)
 end
 function M.getButton(buttonid)
     return repository[buttonid]

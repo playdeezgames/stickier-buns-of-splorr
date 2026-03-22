@@ -21,6 +21,8 @@ function M.load()
     createSprite(sprites.PAWN, "assets/images/pawn.png", 40, -30)
     createSprite(sprites.BLUR, "assets/images/blur.png", 0, 0)
     createSprite(sprites.SHOPPE, "assets/images/shoppe.png", 40, -30)
+    createSprite(sprites.LEAVE, "assets/images/leave.png", 0, 0)
+    createSprite(sprites.LEAVE_HOVER, "assets/images/leavehover.png", 0, 0)
 end
 function M.getSprite(spriteId)
     return repository[spriteId]

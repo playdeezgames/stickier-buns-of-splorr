@@ -17,11 +17,38 @@ end
 local function isUseLotionEnabled(world)
     return not world.avatar.shoppe and world.avatar.lotions > 0
 end
+local function isLeaveEnabled(world)
+    return world.avatar.shoppe
+end
 local function handleUseLotion(world)
     board.useLotion()
 end
+local function handleLeave(world)
+    world.avatar.shoppe = false
+end
 function M.load()
-    createButton(buttons.USE_LOTION, sprites.LOTION, sprites.LOTION_HOVER, constants.USE_LOTION_X, constants.USE_LOTION_Y, constants.USE_LOTION_WIDTH, constants.USE_LOTION_HEIGHT, "Use Lotion", isUseLotionEnabled, handleUseLotion)
+    createButton(
+        buttons.USE_LOTION, 
+        sprites.LOTION, 
+        sprites.LOTION_HOVER, 
+        constants.USE_LOTION_X, 
+        constants.USE_LOTION_Y, 
+        constants.USE_LOTION_WIDTH, 
+        constants.USE_LOTION_HEIGHT, 
+        "Use Lotion", 
+        isUseLotionEnabled, 
+        handleUseLotion)
+    createButton(
+        buttons.LEAVE, 
+        sprites.LEAVE, 
+        sprites.LEAVE_HOVER, 
+        constants.LEAVE_X, 
+        constants.LEAVE_Y, 
+        constants.LEAVE_WIDTH, 
+        constants.LEAVE_HEIGHT, 
+        "Leave Shoppe", 
+        isLeaveEnabled, 
+        handleLeave)
 end
 function M.getButton(buttonid)
     return repository[buttonid]

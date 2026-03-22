@@ -19,6 +19,7 @@ function M.load()
     createSprite(sprites.LOTION_HOVER, "assets/images/lotionhover.png", 0, 0)
     createSprite(sprites.KNIGHT, "assets/images/knight.png", 40, -30)
     createSprite(sprites.PAWN, "assets/images/pawn.png", 40, -30)
+    createSprite(sprites.BLUR, "assets/images/blur.png", 0, 0)
 end
 function M.getSprite(spriteId)
     return repository[spriteId]

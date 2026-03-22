@@ -52,18 +52,11 @@ local function drawBoard(world)
                 spritemanager.getSprite(sprites.CURSOR):draw(plotX, plotY)
             end
             local token = cell.token
-            if token == tokens.KNIGHT then
-                spritemanager.getSprite(sprites.KNIGHT):draw(plotX, plotY)
-            elseif token == tokens.CANCEL then
-                spritemanager.getSprite(sprites.CANCEL):draw(plotX, plotY)
-            elseif token == tokens.BUN then
-                spritemanager.getSprite(sprites.BUN):draw(plotX, plotY)
-            elseif token == tokens.BUTTHOLE then
-                spritemanager.getSprite(sprites.BUTTHOLE):draw(plotX, plotY)
-            elseif token == tokens.PAWN then
-                spritemanager.getSprite(sprites.PAWN):draw(plotX, plotY)
-            elseif token == tokens.BISHOP then
-                spritemanager.getSprite(sprites.BISHOP):draw(plotX, plotY)
+            if token ~= nil then
+                local spriteid = tokenmanager.getSpriteId(token)
+                if spriteid ~= nil then
+                    spritemanager.getSprite(spriteid):draw(plotX, plotY)
+                end
             end
         end
     end
@@ -136,11 +129,16 @@ function love.update(dt)
     buttonmanager.update(board.getWorld())
 end
 
+local function drawBlur(world)
+    --spritemanager.getSprite(sprites.BLUR):draw(0,0)
+end
+
 function love.draw()
     machine:draw()
 
     local world = board.getWorld()
     drawBoard(world)
+    drawBlur(world)
     drawStats(world)
     drawMessages(world)
     drawToolTip(world)

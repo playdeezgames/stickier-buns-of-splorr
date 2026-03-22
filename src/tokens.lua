@@ -5,4 +5,5 @@ M.BUTTHOLE = "butthole"
 M.CANCEL = "cancel"
 M.PAWN = "pawn"
 M.BISHOP = "bishop"
+M.SHOPPE = "shoppe"
 return M

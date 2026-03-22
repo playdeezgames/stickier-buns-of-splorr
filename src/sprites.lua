@@ -12,4 +12,6 @@ M.LOTION_HOVER = "lotion hover"
 M.LIGHT_HILITE = "light hilite"
 M.KNIGHT = "knight"
 M.PAWN = "pawn"
+M.BLUR = "blur"
+M.SHOPPE = "shoppe"
 return M

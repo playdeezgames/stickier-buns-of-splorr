@@ -4,6 +4,8 @@ local buttons = require("buttons")
 local sprites = require("sprites")
 local constants = require("constants")
 local board = require("board")
+local items = require("items")
+local itemmanager = require("itemmanager")
 local repository = {}
 local tooltips = {}
 local enablers = {}
@@ -27,15 +29,15 @@ local function handleLeave(world)
     world.avatar.shoppe = false
 end
 local function getUpgradeBunsToolTip(world)
-    --TODO: get upgrade buns price and put it in the tool tip
-    return "Upgrade Buns"
+    local price = itemmanager.getItemPrice(items.BUN_UPGRADE, world)
+    return "Upgrade Buns(-"..price.." Jools)"
 end
 local function isUpgradeBunsEnabled(world)
-    --TODO: only when i have enough jools for the upgrade
-    return world.avatar.shoppe
+    local price = itemmanager.getItemPrice(items.BUN_UPGRADE, world)
+    return world.avatar.shoppe and world.avatar.jools >= price
 end
 local function handleUpgradeBuns(world)
-    --TODO: upgrade buns
+    itemmanager.buy(items.BUN_UPGRADE, world)
 end
 function M.load()
     createButton(

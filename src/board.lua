@@ -79,7 +79,7 @@ function M.initialize()
         health = 3,
         maximumHealth = 3,
         armour = 5,
-        jools = 0,
+        jools = 50,--TODO: back to 0
         floggers = 0,
         sprays = 0,
         lotions = 1,
@@ -89,7 +89,7 @@ function M.initialize()
     hilite()
     spawnToken(tokens.BUN)
     spawnToken(tokens.BUTTHOLE)
-    spawnToken(tokens.SHOPPE)
+    spawnToken(tokens.SHOPPE)--TODO: eliminate
     spawnPawns()
 end
 function M.getWorld()
@@ -101,6 +101,7 @@ local function addMessage(message)
         table.remove(world.messages)
     end
 end
+M.addMessage = addMessage
 local function uncancel()
     for x = 0, constants.BOARD_WIDTH - 1 do
         for y = 0, constants.BOARD_HEIGHT - 1 do

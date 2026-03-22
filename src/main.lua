@@ -198,7 +198,6 @@ end
 
 --TODO:
 --restart game
---shoppe
 --xp and xp levels
 --trap spray
 --traps
@@ -206,10 +205,7 @@ end
 --streak?
 
 --buttons:
---use lotion
---leave shoppe
 --buy lotion
 --buy flogger
 --buy spray
 --buy armor
---buy supplies

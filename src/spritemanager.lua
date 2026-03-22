@@ -20,6 +20,7 @@ function M.load()
     createSprite(sprites.KNIGHT, "assets/images/knight.png", 40, -30)
     createSprite(sprites.PAWN, "assets/images/pawn.png", 40, -30)
     createSprite(sprites.BLUR, "assets/images/blur.png", 0, 0)
+    createSprite(sprites.SHOPPE, "assets/images/shoppe.png", 40, -30)
 end
 function M.getSprite(spriteId)
     return repository[spriteId]

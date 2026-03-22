@@ -48,7 +48,7 @@ local function drawBoard(world)
             local plotX, plotY = uimanager.plotXY(x,y)
             which:draw(plotX,plotY)
             local cursorX, cursorY = uimanager.getCursorXY()
-            if x == cursorX and y == cursorY then
+            if not world.avatar.shoppe and x == cursorX and y == cursorY then
                 spritemanager.getSprite(sprites.CURSOR):draw(plotX, plotY)
             end
             local token = cell.token
@@ -130,7 +130,9 @@ function love.update(dt)
 end
 
 local function drawBlur(world)
-    --spritemanager.getSprite(sprites.BLUR):draw(0,0)
+    if world.avatar.shoppe then
+        spritemanager.getSprite(sprites.BLUR):draw(0,0)
+    end
 end
 
 function love.draw()
@@ -150,6 +152,10 @@ local function updateToolTip(world)
     local tooltip = buttonmanager.getToolTip(world)
     if tooltip ~= nil then
         uimanager.setToolTip(tooltip)
+        return
+    end
+    if world.avatar.shoppe then
+        uimanager.setToolTip("")
         return
     end
     local cursorX, cursorY = uimanager.getCursorXY()

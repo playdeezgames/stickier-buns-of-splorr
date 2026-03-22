@@ -82,12 +82,14 @@ function M.initialize()
         jools = 0,
         floggers = 0,
         sprays = 0,
-        lotions = 1
+        lotions = 1,
+        shoppe = false
     }
     placeAvatar()
     hilite()
     spawnToken(tokens.BUN)
     spawnToken(tokens.BUTTHOLE)
+    spawnToken(tokens.SHOPPE)
     spawnPawns()
 end
 function M.getWorld()
@@ -195,7 +197,13 @@ local function attackBishop()
     end
     spawnPawns()
 end
+local function enterShoppe()
+    world.avatar.shoppe = true
+end
 function M.attemptMove(x,y)
+    if world.avatar.shoppe then
+        return
+    end
     if x < 0 or y < 0 or x >= constants.BOARD_WIDTH or y >= constants.BOARD_HEIGHT then
         return
     end
@@ -224,6 +232,8 @@ function M.attemptMove(x,y)
         attackPawn()
     elseif token == tokens.BISHOP then
         attackBishop()
+    elseif token == tokens.SHOPPE then
+        enterShoppe()
     end
 end
 function M.useLotion()

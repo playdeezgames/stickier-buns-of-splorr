@@ -15,7 +15,7 @@ local function createButton(buttonid, spriteid, hoverSpriteid, x, y, width, heig
     handlers[buttonid] = handler
 end
 local function isUseLotionEnabled(world)
-    return world.avatar.lotions > 0
+    return not world.avatar.shoppe and world.avatar.lotions > 0
 end
 local function handleUseLotion(world)
     board.useLotion()

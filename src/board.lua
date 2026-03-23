@@ -204,8 +204,23 @@ end
 local function spawnBishop()
     spawnToken(tokens.BISHOP)
 end
+local function addXP(xp)
+    world.avatar.xp = world.avatar.xp + xp
+    addMessage("+"..xp.." XP")
+    local level = world.avatar.xpLevel
+    while world.avatar.xp >= world.avatar.xpGoal do
+        world.avatar.xp = world.avatar.xp - world.avatar.xpGoal
+        world.avatar.xpGoal = world.avatar.xpGoal * 2
+        world.avatar.xpLevel = world.avatar.xpLevel + 1
+        world.avatar.maximumHealth = world.avatar.maximumHealth + 1
+    end
+    if world.avatar.xpLevel > level then
+        addMessage("Yer now level "..world.avatar.xpLevel)
+    end
+end
 local function attackPawn()
     takeDamage(1)
+    addXP(1)
     if getPawnCount() == 0 then
         spawnBishop()
     end
@@ -217,6 +232,7 @@ local function attackBishop()
     else
         takeDamage(3)
     end
+    addXP(3)
     spawnPawns()
     spawnToken(tokens.SHOPPE)
 end

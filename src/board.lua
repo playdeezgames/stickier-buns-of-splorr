@@ -84,7 +84,10 @@ function M.initialize()
         floggers = 0,
         sprays = 0,
         lotions = 0,
-        shoppe = false
+        shoppe = false,
+        xp = 0,
+        xpGoal = 5,
+        xpLevel = 0
     }
     placeAvatar()
     hilite()

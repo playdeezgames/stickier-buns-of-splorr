@@ -94,6 +94,12 @@ local function drawStats(world)
     love.graphics.setColor(0.0,0.0,0.66)
     love.graphics.print("Trap Sprays: "..world.avatar.sprays, 0, y)
     y = y + constants.LINE_HEIGHT
+
+    love.graphics.setColor(1.0,1.0,1.0)
+    love.graphics.print("XP: "..world.avatar.xp.."/"..world.avatar.xpGoal, 0, y)
+    y = y + constants.LINE_HEIGHT
+    love.graphics.print("Level: "..world.avatar.xpLevel, 0, y)
+    y = y + constants.LINE_HEIGHT
 end
 
 local function drawMessages(world)

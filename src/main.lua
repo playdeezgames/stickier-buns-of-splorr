@@ -187,12 +187,10 @@ end
 --https://game-icons.net/1x1/sbed/flake.html
 --https://game-icons.net/1x1/sbed/cancel.html
 --https://game-icons.net/1x1/caro-asercion/dumpling-bao.html
---https://ninjikin.itch.io/font-antiquity-script
---https://game-icons.net/1x1/delapouite/liquid-soap.html
-
---https://game-icons.net/1x1/skoll/spiked-bat.html
---https://game-icons.net/1x1/delapouite/wood-club.html
 --https://game-icons.net/1x1/delapouite/flanged-mace.html
+--https://game-icons.net/1x1/delapouite/liquid-soap.html
+--https://game-icons.net/1x1/delapouite/exit-door.html
+--https://ninjikin.itch.io/font-antiquity-script
 
 --7z a -tzip -r ..\stickier.love *
 
@@ -205,7 +203,6 @@ end
 --streak?
 
 --buttons:
---buy lotion
 --buy flogger
 --buy spray
 --buy armor

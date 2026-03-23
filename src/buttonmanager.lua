@@ -50,6 +50,17 @@ end
 local function handleBuyLotion(world)
     itemmanager.buy(items.LOTION, world)
 end
+local function getFloggerToolTip(world)
+    local price = itemmanager.getItemPrice(items.FLOGGER, world)
+    return "Buy Flogger(-"..price.." Jools)"
+end
+local function isFloggerEnabled(world)
+    local price = itemmanager.getItemPrice(items.FLOGGER, world)
+    return world.avatar.shoppe and world.avatar.jools >= price
+end
+local function handleFlogger(world)
+    itemmanager.buy(items.FLOGGER, world)
+end
 function M.load()
     createButton(
         buttons.USE_LOTION, 
@@ -95,6 +106,17 @@ function M.load()
         getBuyLotionToolTip, 
         isBuyLotionEnabled, 
         handleBuyLotion)
+    createButton(
+        buttons.FLOGGER, 
+        sprites.FLOGGER, 
+        sprites.FLOGGER_HOVER, 
+        constants.FLOGGER_X, 
+        constants.FLOGGER_Y, 
+        constants.FLOGGER_WIDTH, 
+        constants.FLOGGER_HEIGHT, 
+        getFloggerToolTip, 
+        isFloggerEnabled, 
+        handleFlogger)
 end
 function M.getButton(buttonid)
     return repository[buttonid]

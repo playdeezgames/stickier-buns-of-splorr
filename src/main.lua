@@ -206,6 +206,4 @@ end
 
 --TODO:
 --restart game
---xp and xp levels
 --streak?
-

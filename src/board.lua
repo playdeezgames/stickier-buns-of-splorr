@@ -30,6 +30,7 @@ local function spawnToken(token)
         y = love.math.random(0, constants.BOARD_HEIGHT - 1)
     until getToken(x,y) == nil
     placeToken(x,y,token)
+    return x, y
 end
 local function unhilite()
     for x = 0, constants.BOARD_WIDTH - 1 do
@@ -124,26 +125,12 @@ local function starve()
         changeHealth(-1)
     end
 end
-local function checkButthole()
-    addMessage("Checking butthole...")
-    local result = butthole.check()
-    if result == butthole.NOTHING then
-    elseif result == butthole.JOOLS then
-        local jools = 3 + love.math.random(1,3) + love.math.random(1,3)
-        world.avatar.jools = world.avatar.jools + jools
-        addMessage("+"..jools.." Jools!")
-    elseif result == butthole.TRAP then
-    elseif result == butthole.TELEPORT then
-    elseif result == butthole.ARMOUR then
-        world.avatar.armour = world.avatar.armour + 1
-        addMessage("+1 Armour!")
-    elseif result == butthole.FLOGGER then
-        world.avatar.floggers = world.avatar.floggers + 1
-        addMessage("+1 Flogger!")
-    elseif result == butthole.LOTION then
-        world.avatar.lotions = world.avatar.lotions + 1
-        addMessage("+1 lotion!")
-    end
+local function teleport()
+    placeToken(world.avatar.x, world.avatar.y, nil)
+    unhilite()
+    world.avatar.x, world.avatar.y = spawnToken(tokens.KNIGHT)
+    hilite()
+    addMessage("You teleported!")
 end
 local function takeDamage(damage)
     addMessage("You take "..damage.." damage!")
@@ -167,6 +154,38 @@ local function takeDamage(damage)
     end
     if world.avatar.health <= 0 then
         unhilite()
+    end
+end
+local function trap()
+    addMessage("You trigger a trap!")
+    if world.avatar.sprays > 0 then
+        addMessage("-1 Trap Spray")
+        world.avatar.sprays = world.avatar.sprays - 1
+    else
+        takeDamage(1)
+    end
+end
+local function checkButthole()
+    addMessage("Checking butthole...")
+    local result = butthole.check()
+    if result == butthole.NOTHING then
+    elseif result == butthole.JOOLS then
+        local jools = 3 + love.math.random(1,3) + love.math.random(1,3)
+        world.avatar.jools = world.avatar.jools + jools
+        addMessage("+"..jools.." Jools!")
+    elseif result == butthole.TRAP then
+        trap()
+    elseif result == butthole.TELEPORT then
+        teleport()
+    elseif result == butthole.ARMOUR then
+        world.avatar.armour = world.avatar.armour + 1
+        addMessage("+1 Armour!")
+    elseif result == butthole.FLOGGER then
+        world.avatar.floggers = world.avatar.floggers + 1
+        addMessage("+1 Flogger!")
+    elseif result == butthole.LOTION then
+        world.avatar.lotions = world.avatar.lotions + 1
+        addMessage("+1 lotion!")
     end
 end
 local function getPawnCount()

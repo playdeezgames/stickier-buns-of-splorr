@@ -200,13 +200,9 @@ end
 --7z a -tzip -r ..\stickier.love *
 
 --TODO:
---restart game
---xp and xp levels
---trap spray
 --traps
 --teleports
+--restart game
+--xp and xp levels
 --streak?
 
---buttons:
---buy armor
---buy spray

@@ -190,6 +190,7 @@ end
 --https://game-icons.net/1x1/delapouite/flanged-mace.html
 --https://game-icons.net/1x1/delapouite/liquid-soap.html
 --https://game-icons.net/1x1/delapouite/exit-door.html
+--https://game-icons.net/1x1/delapouite/armor-upgrade.html
 --https://ninjikin.itch.io/font-antiquity-script
 
 --7z a -tzip -r ..\stickier.love *
@@ -203,6 +204,5 @@ end
 --streak?
 
 --buttons:
---buy flogger
---buy spray
 --buy armor
+--buy spray

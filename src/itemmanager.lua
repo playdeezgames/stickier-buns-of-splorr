@@ -29,10 +29,18 @@ local function buyFlogger(world)
     world.avatar.floggers = world.avatar.floggers + 1
     board.addMessage("+1 Flogger("..world.avatar.floggers..")")
 end
+local function calculateArmourPrice(world)
+    return world.avatar.armour + 1
+end
+local function buyArmour(world)
+    world.avatar.armour = world.avatar.armour + 1
+    board.addMessage("+1 Armour("..world.avatar.armour..")")
+end
 function M.load()
     createItem(items.BUN_UPGRADE, calculateBunUpgradePrice, buyBunUpgrade)
     createItem(items.LOTION, calculateLotionPrice, buyLotion)
     createItem(items.FLOGGER, calculateFloggerPrice, buyFlogger)
+    createItem(items.ARMOUR, calculateArmourPrice, buyArmour)
 end
 function M.getItemPrice(itemid, world)
     return repository[itemid].calculateprice(world)

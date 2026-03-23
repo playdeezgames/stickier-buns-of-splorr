@@ -22,4 +22,6 @@ M.BUY_LOTION = "buy lotion"
 M.BUY_LOTION_HOVER = "buy lotion hover"
 M.FLOGGER = "flogger"
 M.FLOGGER_HOVER = "flogger hover"
+M.ARMOUR = "armour"
+M.ARMOUR_HOVER = "armour hover"
 return M

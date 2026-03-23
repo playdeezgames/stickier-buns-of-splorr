@@ -3,4 +3,5 @@ M.BUN_UPGRADE = "bun upgrade"
 M.LOTION = "lotion"
 M.FLOGGER = "flogger"
 M.ARMOUR = "armour"
+M.SPRAY = "spray"
 return M

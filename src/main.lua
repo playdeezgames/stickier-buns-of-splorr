@@ -90,6 +90,10 @@ local function drawStats(world)
     love.graphics.setColor(0.66,0.66,0.66)
     love.graphics.print("Lotions: "..world.avatar.lotions, 0, y)
     y = y + constants.LINE_HEIGHT
+
+    love.graphics.setColor(0.0,0.0,0.66)
+    love.graphics.print("Trap Sprays: "..world.avatar.sprays, 0, y)
+    y = y + constants.LINE_HEIGHT
 end
 
 local function drawMessages(world)

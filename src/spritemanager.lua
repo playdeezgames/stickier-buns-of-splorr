@@ -31,6 +31,8 @@ function M.load()
     createSprite(sprites.FLOGGER_HOVER, "assets/images/floggerhover.png", 0, 0)
     createSprite(sprites.ARMOUR, "assets/images/armour.png", 0, 0)
     createSprite(sprites.ARMOUR_HOVER, "assets/images/armourhover.png", 0, 0)
+    createSprite(sprites.SPRAY, "assets/images/spray.png", 0, 0)
+    createSprite(sprites.SPRAY_HOVER, "assets/images/sprayhover.png", 0, 0)
 end
 function M.getSprite(spriteId)
     return repository[spriteId]

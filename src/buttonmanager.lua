@@ -72,6 +72,17 @@ end
 local function handleArmour(world)
     itemmanager.buy(items.ARMOUR, world)
 end
+local function getSprayToolTip(world)
+    local price = itemmanager.getItemPrice(items.SPRAY, world)
+    return "Buy Trap Spray(-"..price.." Jools)"
+end
+local function isSprayEnabled(world)
+    local price = itemmanager.getItemPrice(items.SPRAY, world)
+    return world.avatar.shoppe and world.avatar.jools >= price
+end
+local function handleSpray(world)
+    itemmanager.buy(items.SPRAY, world)
+end
 function M.load()
     createButton(
         buttons.USE_LOTION, 
@@ -139,6 +150,17 @@ function M.load()
         getArmourToolTip, 
         isArmourEnabled, 
         handleArmour)
+    createButton(
+        buttons.SPRAY, 
+        sprites.SPRAY, 
+        sprites.SPRAY_HOVER, 
+        constants.SPRAY_X, 
+        constants.SPRAY_Y, 
+        constants.SPRAY_WIDTH, 
+        constants.SPRAY_HEIGHT, 
+        getSprayToolTip, 
+        isSprayEnabled, 
+        handleSpray)
 end
 function M.getButton(buttonid)
     return repository[buttonid]

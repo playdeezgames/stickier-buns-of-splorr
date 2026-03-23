@@ -24,4 +24,6 @@ M.FLOGGER = "flogger"
 M.FLOGGER_HOVER = "flogger hover"
 M.ARMOUR = "armour"
 M.ARMOUR_HOVER = "armour hover"
+M.SPRAY = "spray"
+M.SPRAY_HOVER = "spray hover"
 return M

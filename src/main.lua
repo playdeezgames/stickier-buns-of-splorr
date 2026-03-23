@@ -107,7 +107,6 @@ local function drawMessages(world)
 end
 
 local function drawToolTip(world)
-    --TODO: if we are hovering over a button, show THAT instead of token tooltip
     local y = 0
     love.graphics.setColor(1,1,1)
     love.graphics.setFont(fontmanager.getFont(fonts.MESSAGE))
@@ -200,8 +199,6 @@ end
 --7z a -tzip -r ..\stickier.love *
 
 --TODO:
---traps
---teleports
 --restart game
 --xp and xp levels
 --streak?

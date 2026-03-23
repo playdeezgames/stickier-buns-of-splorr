@@ -83,7 +83,7 @@ local function drawStats(world)
     love.graphics.print("Armour: "..world.avatar.armour, 0, y)
     y = y + constants.LINE_HEIGHT
 
-    love.graphics.setColor(0.33,0.33,0.33)
+    love.graphics.setColor(0.0,0.66,0.66)
     love.graphics.print("Floggers: "..world.avatar.floggers, 0, y)
     y = y + constants.LINE_HEIGHT
 

@@ -39,6 +39,17 @@ end
 local function handleUpgradeBuns(world)
     itemmanager.buy(items.BUN_UPGRADE, world)
 end
+local function getBuyLotionToolTip(world)
+    local price = itemmanager.getItemPrice(items.LOTION, world)
+    return "Buy Lotion(-"..price.." Jools)"
+end
+local function isBuyLotionEnabled(world)
+    local price = itemmanager.getItemPrice(items.LOTION, world)
+    return world.avatar.shoppe and world.avatar.jools >= price
+end
+local function handleBuyLotion(world)
+    itemmanager.buy(items.LOTION, world)
+end
 function M.load()
     createButton(
         buttons.USE_LOTION, 
@@ -73,6 +84,17 @@ function M.load()
         getUpgradeBunsToolTip, 
         isUpgradeBunsEnabled, 
         handleUpgradeBuns)
+    createButton(
+        buttons.BUY_LOTION, 
+        sprites.BUY_LOTION, 
+        sprites.BUY_LOTION_HOVER, 
+        constants.BUY_LOTION_X, 
+        constants.BUY_LOTION_Y, 
+        constants.BUY_LOTION_WIDTH, 
+        constants.BUY_LOTION_HEIGHT, 
+        getBuyLotionToolTip, 
+        isBuyLotionEnabled, 
+        handleBuyLotion)
 end
 function M.getButton(buttonid)
     return repository[buttonid]

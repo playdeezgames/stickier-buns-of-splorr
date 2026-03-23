@@ -15,8 +15,16 @@ local function buyBunUpgrade(world)
     world.avatar.maximumBuns = world.avatar.maximumBuns + 1
     board.addMessage("+1 Maximum Buns("..world.avatar.maximumBuns..")")
 end
+local function calculateLotionPrice(world)
+    return 10
+end
+local function buyLotion(world)
+    world.avatar.lotions = world.avatar.lotions + 1
+    board.addMessage("+1 Lotion("..world.avatar.lotions..")")
+end
 function M.load()
     createItem(items.BUN_UPGRADE, calculateBunUpgradePrice, buyBunUpgrade)
+    createItem(items.LOTION, calculateLotionPrice, buyLotion)
 end
 function M.getItemPrice(itemid, world)
     return repository[itemid].calculateprice(world)

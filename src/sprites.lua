@@ -18,4 +18,6 @@ M.PAWN = "pawn"
 M.SHOPPE = "shoppe"
 M.UPGRADE_BUNS = "upgrade buns"
 M.UPGRADE_BUNS_HOVER = "upgrade buns hover"
+M.BUY_LOTION = "buy lotion"
+M.BUY_LOTION_HOVER = "buy lotion hover"
 return M

@@ -200,10 +200,10 @@ end
 --https://game-icons.net/1x1/delapouite/liquid-soap.html
 --https://game-icons.net/1x1/delapouite/exit-door.html
 --https://game-icons.net/1x1/delapouite/armor-upgrade.html
+--https://game-icons.net/1x1/guard13007/play-button.html
 --https://ninjikin.itch.io/font-antiquity-script
 
 --7z a -tzip -r ..\stickier.love *
 
 --TODO:
---restart game
 --streak?

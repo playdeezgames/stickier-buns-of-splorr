@@ -26,4 +26,6 @@ M.ARMOUR = "armour"
 M.ARMOUR_HOVER = "armour hover"
 M.SPRAY = "spray"
 M.SPRAY_HOVER = "spray hover"
+M.PLAY = "play"
+M.PLAY_HOVER = "play hover"
 return M

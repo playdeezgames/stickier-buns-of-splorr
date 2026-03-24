@@ -17,7 +17,7 @@ local function createButton(buttonid, spriteid, hoverSpriteid, x, y, width, heig
     handlers[buttonid] = handler
 end
 local function isUseLotionEnabled(world)
-    return not world.avatar.shoppe and world.avatar.lotions > 0
+    return not world.avatar.shoppe and world.avatar.lotions > 0 and world.avatar.health > 0
 end
 local function isLeaveEnabled(world)
     return world.avatar.shoppe
@@ -83,6 +83,12 @@ end
 local function handleSpray(world)
     itemmanager.buy(items.SPRAY, world)
 end
+local function isPlayEnabled(world)
+    return world.avatar.health == 0
+end
+local function handlePlay(world)
+    board.initialize()
+end
 function M.load()
     createButton(
         buttons.USE_LOTION, 
@@ -95,6 +101,17 @@ function M.load()
         "Use Lotion", 
         isUseLotionEnabled, 
         handleUseLotion)
+    createButton(
+        buttons.PLAY, 
+        sprites.PLAY, 
+        sprites.PLAY_HOVER, 
+        constants.PLAY_X, 
+        constants.PLAY_Y, 
+        constants.PLAY_WIDTH, 
+        constants.PLAY_HEIGHT, 
+        "Play Again", 
+        isPlayEnabled, 
+        handlePlay)
     createButton(
         buttons.LEAVE, 
         sprites.LEAVE, 

@@ -2,6 +2,8 @@
 package game
 
 import "core:log"
+import "core:strconv"
+import "core:strings"
 import "core:testing"
 
 // Empties the board except for the knight.
@@ -467,4 +469,53 @@ test_soak_immortal :: proc(t: ^testing.T) {
 	log.infof("immortal soak: deaths %d shops %d level %d", deaths, shop_visits, level)
 	testing.expect(t, shop_visits > 0, "soak never reached the shoppe")
 	testing.expect(t, level > 0, "soak never levelled up")
+}
+
+// Answers recorded from the original Lua under LÖVE (tools/gen_lua_reference.sh).
+ISO_REFERENCE := #load("testdata/iso_reference.txt", string)
+
+@(test)
+test_iso_matches_lua :: proc(t: ^testing.T) {
+	plots, maps := 0, 0
+	rest := ISO_REFERENCE
+	for line in strings.split_lines_iterator(&rest) {
+		fields := strings.fields(line, context.temp_allocator)
+		if len(fields) != 5 {
+			continue
+		}
+		a, _ := strconv.parse_int(fields[1])
+		b, _ := strconv.parse_int(fields[2])
+		c, _ := strconv.parse_int(fields[3])
+		d, _ := strconv.parse_int(fields[4])
+		switch fields[0] {
+		case "P":
+			px, py := plot_xy(a, b)
+			testing.expectf(t, px == c && py == d, "plot_xy(%d,%d) = %d,%d; Lua %d,%d", a, b, px, py, c, d)
+			plots += 1
+		case "M":
+			mx, my := map_xy(a, b)
+			testing.expectf(t, mx == c && my == d, "map_xy(%d,%d) = %d,%d; Lua %d,%d", a, b, mx, my, c, d)
+			maps += 1
+		}
+	}
+	testing.expect_value(t, plots, 64)
+	testing.expect_value(t, maps, 4256)
+	free_all(context.temp_allocator)
+}
+
+@(test)
+test_cell_centres_round_trip :: proc(t: ^testing.T) {
+	// The middle of every tile's diamond should map back to its own cell.
+	for x in 0 ..< BOARD_WIDTH {
+		for y in 0 ..< BOARD_HEIGHT {
+			px, py := plot_xy(x, y)
+			mx, my := map_xy(px + TILE_WIDTH / 2, py + TILE_HEIGHT / 2)
+			testing.expectf(t, mx == x && my == y, "cell %d,%d came back as %d,%d", x, y, mx, my)
+		}
+	}
+}
+
+@(test)
+test_mousemap_data_size :: proc(t: ^testing.T) {
+	testing.expect_value(t, len(MOUSEMAP_DATA), MOUSEMAP_WIDTH * MOUSEMAP_HEIGHT)
 }

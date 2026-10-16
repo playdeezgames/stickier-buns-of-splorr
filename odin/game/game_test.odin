@@ -1,6 +1,7 @@
 #+build !js
 package game
 
+import "core:fmt"
 import "core:log"
 import "core:strconv"
 import "core:strings"
@@ -681,4 +682,178 @@ test_play_again :: proc(t: ^testing.T) {
 	testing.expect_value(t, count_tokens(&w, .Pawn), PAWN_COUNT)
 	testing.expect_value(t, w.message_count, 0)
 	testing.expect(t, w.random != nil)
+}
+
+// ---- Parity with the original Lua (tools/lua_trace.lua) ----
+// The same scripted policy and the same random streams drive both implementations; every few
+// steps a checksum of the whole game state must match the one the Lua produced.
+
+LUA_TRACE := #load("testdata/lua_trace.txt", string)
+TRACE_CHECKPOINT :: 5
+
+stream_next :: proc(state: ^u64, lo, hi: int) -> int {
+	state^ = (state^ * 1103515245 + 12345) & 0x7fffffff
+	return lo + int((state^ >> 8) % u64(hi - lo + 1))
+}
+
+game_stream: u64
+game_stream_random :: proc(lo, hi: int) -> int {
+	return stream_next(&game_stream, lo, hi)
+}
+
+token_code :: proc(token: Token) -> u8 {
+	switch token {
+	case .None:
+		return '.'
+	case .Knight:
+		return 'K'
+	case .Bun:
+		return 'B'
+	case .Butthole:
+		return 'H'
+	case .Cancel:
+		return 'C'
+	case .Pawn:
+		return 'P'
+	case .Bishop:
+		return 'I'
+	case .Shoppe:
+		return 'S'
+	}
+	return '?'
+}
+
+// Same layout as stateLine in tools/lua_trace.lua.
+state_line :: proc(w: ^World, allocator := context.temp_allocator) -> string {
+	a := &w.avatar
+	b := strings.builder_make(allocator)
+	fmt.sbprintf(
+		&b,
+		"a:%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d|T:",
+		a.x, a.y, a.buns, a.maximum_buns, a.health, a.maximum_health, a.armour, a.jools,
+		a.floggers, a.sprays, a.lotions, 1 if a.shoppe else 0, a.xp, a.xp_goal, a.xp_level,
+	)
+	for x in 0 ..< BOARD_WIDTH {
+		for y in 0 ..< BOARD_HEIGHT {
+			strings.write_byte(&b, token_code(w.cells[x][y].token))
+		}
+	}
+	strings.write_string(&b, "|H:")
+	for x in 0 ..< BOARD_WIDTH {
+		for y in 0 ..< BOARD_HEIGHT {
+			strings.write_byte(&b, '1' if w.cells[x][y].hilite else '0')
+		}
+	}
+	strings.write_string(&b, "|E:")
+	for id in Button_Id {
+		strings.write_byte(&b, '1' if button_enabled(w, id) else '0')
+	}
+	strings.write_string(&b, "|M:")
+	for i in 0 ..< w.message_count {
+		if i > 0 {
+			strings.write_byte(&b, ';')
+		}
+		strings.write_string(&b, message_text(w, i))
+	}
+	return strings.to_string(b)
+}
+
+fnv32 :: proc(s: string) -> u32 {
+	hash := u32(2166136261)
+	for c in transmute([]u8)s {
+		hash = (hash ~ u32(c)) * 16777619
+	}
+	return hash
+}
+
+@(test)
+test_parity_with_lua_trace :: proc(t: ^testing.T) {
+	rest := LUA_TRACE
+	runs, checkpoints := 0, 0
+	for line in strings.split_lines_iterator(&rest) {
+		fields := strings.fields(line, context.temp_allocator)
+		if len(fields) != 4 || fields[0] != "run" {
+			continue
+		}
+		seed, _ := strconv.parse_int(fields[1])
+		cheat := fields[2] == "1"
+		steps, _ := strconv.parse_int(fields[3])
+		runs += 1
+
+		game_stream = u64(seed)
+		policy := u64(seed + 1000)
+		w: World
+		world_init(&w, game_stream_random)
+
+		// Checks the next recorded checksum against the current state.
+		check :: proc(t: ^testing.T, rest: ^string, w: ^World, seed, step: int) -> bool {
+			expected_text, _ := strings.split_lines_iterator(rest)
+			expected, _ := strconv.parse_u64(expected_text)
+			text := state_line(w)
+			actual := fnv32(text)
+			if u64(actual) != expected {
+				testing.expectf(t, false, "seed %d step %d: checksum %d, Lua says %d\n%s", seed, step, actual, expected, text)
+				return false
+			}
+			return true
+		}
+		if !check(t, &rest, &w, seed, 0) {
+			return
+		}
+		checkpoints += 1
+
+		for step in 1 ..= steps {
+			a := &w.avatar
+			if a.health <= 0 {
+				world_init(&w)
+			} else {
+				if cheat {
+					a.armour = max(a.armour, 4)
+					a.buns = max(a.buns, 3)
+				}
+				if a.shoppe {
+					for item in Item_Id {
+						for a.jools >= item_price(&w, item) && stream_next(&policy, 0, 1) == 0 {
+							buy(&w, item)
+						}
+					}
+					a.shoppe = false
+				}
+				if a.lotions > 0 && a.health < a.maximum_health {
+					use_lotion(&w)
+				}
+				moves: [8][2]int
+				n := 0
+				for x in 0 ..< BOARD_WIDTH {
+					for y in 0 ..< BOARD_HEIGHT {
+						if w.cells[x][y].hilite && n < len(moves) {
+							moves[n] = {x, y}
+							n += 1
+						}
+					}
+				}
+				pick := moves[stream_next(&policy, 0, n - 1)]
+				if stream_next(&policy, 0, 9) < 8 {
+					best := -1
+					for i in 0 ..< n {
+						p := move_priority(get_token(&w, moves[i].x, moves[i].y), a.buns)
+						if p > best {
+							best = p
+							pick = moves[i]
+						}
+					}
+				}
+				attempt_move(&w, pick.x, pick.y)
+			}
+			if step % TRACE_CHECKPOINT == 0 {
+				if !check(t, &rest, &w, seed, step) {
+					return
+				}
+				checkpoints += 1
+			}
+			free_all(context.temp_allocator)
+		}
+	}
+	testing.expect_value(t, runs, 6)
+	testing.expect_value(t, checkpoints, 6 * (1 + 2000 / TRACE_CHECKPOINT))
 }

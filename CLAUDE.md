@@ -4,38 +4,54 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-"Stickier Buns of SPLORR!!" is a small LÖVE2D (Lua, LÖVE 11.5, LuaJIT) game: an isometric 8x8 chess-board roguelike. You are a Knight that moves only in knight-L jumps, eating Buns (food), checking Buttholes (random loot/trap), killing Pawns/Bishops for XP, and buying upgrades at a Shoppe. The project is planned to be **ported to an Odin/WASM stack**, so the Lua source is effectively the reference spec for behaviour.
+"Stickier Buns of SPLORR!!" is a small isometric 8x8 chess-board roguelike: you are a Knight that moves only in knight-L jumps, eating Buns (food), checking Buttholes (random loot/trap), killing Pawns/Bishops for XP, and buying upgrades at a Shoppe.
 
-All game code lives in `src/` (this is the LÖVE game root; `assets/` at the repo root holds only source/template art, runtime images are in `src/assets/`). There is no test suite, linter, or build script.
+The game is being **ported from LÖVE2D (Lua) to Odin compiled to WebAssembly**. The port is playable and rule-for-rule identical to the Lua (verified by a differential test). Two trees coexist:
+
+- `odin/` + `web/` — the port (the future). Work here.
+- `src/` — the original LÖVE 11.5 game, kept as the behavioural reference and as the source of the test oracles. Run it with `love src`. Don't add features to it.
+
+Port plan and status: `PORT_PLAN.md` (steps 1-8 done; step 7 was folded into 6; remaining: ship prep and retiring the Lua). The author's recipes live in the vault at `/home/yermom/git/bok-of-splorr/splorr` (`Tech/Odin wasm recipe.md`, `Tech/Release standard.md`, `Gotchas.md`); this port follows the "pure rules package + thin web layer" variant.
+
+Itch page: https://thegrumpygamedev.itch.io/stickier-buns-of-splorr (slug `stickier-buns-of-splorr`; new pages use channel `html`). Never run `butler push` or `git push` unless the user says to; if "push" is ambiguous, ask which.
 
 ## Commands
 
-Run from the repo root (LÖVE must be installed):
+Odin is at `/home/yermom/ODIN/odin` (nightly `dev-2026-07-nightly`); scripts honour `$ODIN`.
 
 ```bash
-love src
+tools/test.sh    # native tests (-o:speed, single thread) + `odin check` of both packages for js_wasm32
+tools/build.sh   # builds build/web (game.wasm, odin.js, index.html, assets/) — what gets shipped
 ```
 
-- Debug (VS Code `lua-local` debugger, see `src/.vscode/launch.json`): launches with the extra arg `debug`, which makes `main.lua` call `require("lldebugger").start()`. The launch config hardcodes a Windows path to `love.exe`.
-- Package: `7z a -tzip -r ..\stickier.love *` run inside `src/` (noted in `main.lua`). `stickier.love` and `index.html` are gitignored build outputs.
-- Window is fixed 1280x720, non-resizable (`src/conf.lua`).
+Run a single test: `odin test odin/game -collection:sb=odin -define:ODIN_TEST_THREADS=1 -define:ODIN_TEST_NAMES=game.test_lotion`
 
-## Architecture
+Serve for manual play: `python3 -m http.server <port> --bind 127.0.0.1 -d build/web` (must be http, not `file://`). Other sessions may be using ports — check with `ss -ltn` first, and kill only the server you started (by pid; `pkill -f` kills your own shell).
 
-Plain Lua modules (`local M = {}` ... `return M`), loaded with `require("name")` relative to `src/`. No classes/OOP library; "instances" are tables with closures (`statemachine.create()`, `button.create(...)`).
+Regenerating oracles (only when the Lua or art changes): `python3 tools/gen_mousemap.py` (needs Pillow; writes `odin/game/mousemap.bin`), `tools/gen_lua_reference.sh` (runs the Lua under headless `love`, writes `testdata/iso_reference.txt`), `lua5.4 tools/lua_trace.lua > odin/game/testdata/lua_trace.txt` (from repo root).
 
-**Single global game state** lives in `board.lua`: `board.getWorld()` returns `world = {board[x][y], avatar, messages}`. `board.initialize()` resets it (used for restart). All game rules (movement, `attemptMove`, damage/armour, hunger via `starve`, XP/levelling, butthole outcomes, teleport, lotion) are in `board.lua`; `itemmanager.lua` handles shop prices/purchases and mutates `world.avatar` directly. Rendering code reads `world` but never owns it.
+## Architecture (Odin port)
 
-**Data-driven "ID + manager" pattern** — repeated across the codebase:
-- `sprites.lua`, `tokens.lua`, `buttons.lua`, `items.lua`, `fonts.lua`, `states.lua` are pure string-constant ID tables.
-- `spritemanager`, `tokenmanager`, `buttonmanager`, `itemmanager`, `fontmanager` each have `load()` (called from `love.load` in `main.lua`) that fills a private `repository` keyed by ID, and `getX(id)` accessors. To add a new entity type you touch the ID file plus the matching manager `load()` (e.g. a new token needs an entry in `tokens.lua`, `tokenmanager.load`, a sprite in `sprites.lua` + `spritemanager.load`, and the PNG in `src/assets/images/`).
-- `buttonmanager.lua` registers each button with parallel tables of tooltip/enabler/handler functions keyed by button ID; layout positions come from `constants.lua`.
+Always build with `-collection:sb=odin` so `odin/web` imports `sb:game`.
 
-**Isometric coordinate pipeline** (important when porting):
-- `uimanager.plotXY(x,y)` converts board cell -> screen via the iso formula `((x-y)*TILE_W/2, (x+y)*TILE_H/2)` then `scroller.toScreen` (centres the board; `scroller.fromScreen` is the inverse).
-- Mouse -> cell: `uimanager.mapXY` -> `mousemap.mapXY` un-scrolls the pixel, computes the coarse diamond cell, then looks up the pixel's colour in `assets/images/mousemap.png` (corner colours = UL/UR/LL/LR vs. centre) to adjust the cell by one. The mousemap image is loaded as ImageData at startup and is load-bearing — a port must reproduce this lookup (or the equivalent geometry).
-- Sprites have per-sprite draw offsets (`spritemanager.load`) since token art is taller than a tile.
+- `odin/game` (package `game`): **pure rules, no platform imports**, so it tests natively. Never import `core:os` here or in anything compiled for wasm (it panics at startup on `js_wasm32`); platform code goes in `#+build js` files and the test file is `#+build !js`.
+  - `world.odin`: `World` (cells, avatar, message log newest-first, injectable `random` proc), `Token` enum + `token_table` (tooltips/sprites).
+  - `board.odin`: all rules (`world_init`, `attempt_move`, damage, XP, butthole effects, teleport, lotion). `items.odin`: shop prices/`buy`. `butthole.odin`: weights + generic `pick_weighted` (fixed enum order).
+  - `iso.odin`: board↔screen math and `map_xy` (mouse → cell), which looks pixels up in `mousemap.bin`, a baked copy of `mousemap.png` classifying pixels as centre/UL/UR/LL/LR corner.
+  - `buttons.odin`: button layout/enable rules/tooltips/actions (Play restarts via `world_init`). `ui.odin`: hover/cursor/tooltip state and `ui_mouse_pressed` (a button click never also moves the knight — a deliberate fix of a Lua bug).
+  - `sprites.odin`: `Sprite_Id`/`sprite_table` (file + draw offsets) and fonts. **Order of `Sprite_Id` is load-bearing**: the page loads images by index via exported `image_count/image_path_ptr/image_path_len`.
+- `odin/web` (package `main`, `#+build js`): `web.odin` has the shim imports (`foreign import canvas "canvas"`), mouse listeners, exported `step` frame loop; `render.odin` draws a frame from `World` in the same order as the Lua `love.draw`.
+- `web/index.html`: the 2D-canvas shim (draw image/text, text metrics), asset preloading (images + Antiquity font; the game waits on `assets_ready`), `odin.runWasm("game.wasm", null, imports, memory)`. Canvas is a fixed 1280x720 logical screen, CSS-scaled; mouse coordinates are rescaled in `logical_xy`. `web/assets/` holds the runtime images/font.
+- Randomness: `core:math/rand`, seeded in `main`. All "find a free tile" loops are capped (`SPAWN_ATTEMPTS`), because an unbounded loop freezes the whole browser tab. `int` is 32-bit on wasm.
 
-**Input/draw flow**: `main.lua` defines the LÖVE callbacks and all HUD drawing (`drawBoard`, `drawStats`, `drawMessages`, tooltip, buttons, "Yer Dead!"). `love.mousepressed` first lets `buttonmanager.handleClick` consume the click, otherwise calls `board.attemptMove(cursor)`. A `statemachine`/`inplaystate` skeleton exists but only has the one `IN_PLAY` state with empty handlers; the real logic is still in `main.lua`/`board.lua`.
+## Tests
 
-**Game-rule notes**: moves are only legal onto highlighted cells (knight deltas, `board.lua`); each move costs a bun, and at 0 buns costs health instead. The previous cell gets a `CANCEL` token for one turn (can't move back). Killing the last Pawn spawns a Bishop; killing a Bishop respawns pawns and a Shoppe; `world.avatar.shoppe` flips the UI into shop mode (board input blocked, blur overlay, shop buttons enabled). Butthole outcomes use weighted random tables in `butthole.lua`. Randomness uses `love.math.random` throughout.
+`odin/game/game_test.odin` has unit tests, two soak tests (the "immortal" one tops up health/armour/buns so the knight reaches bishops and the shop), and two oracle tests that must stay green:
+- `test_iso_matches_lua`: `plot_xy`/`map_xy` against 4,320 answers recorded from the real Lua.
+- `test_parity_with_lua_trace`: replays a scripted policy with identical LCG random streams through both implementations and compares full-state checksums (avatar, board, highlights, button enable flags, messages) — a rule change in Odin that isn't mirrored in the Lua (or vice versa) fails here at a named seed/step. The Lua side swaps `pairs` iteration in `butthole.check` for a fixed order so the two line up.
+
+Rendering is not covered by tests; check it by eye in the browser pane (its screenshots lag one step — take a second one).
+
+## Original Lua game (`src/`) — reference
+
+LÖVE module layout, same ID+manager pattern the Odin enums replaced: `board.lua` holds the single `world` and all rules; `spritemanager/tokenmanager/buttonmanager/itemmanager/fontmanager` fill private repositories from ID files in `load()`; `mousemap.lua` + `uimanager.lua` + `scroller.lua` do the isometric mapping; `main.lua` has the callbacks and HUD drawing; `statemachine/inplaystate` are an unused one-state stub. `src/.vscode/launch.json` hardcodes a Windows `love.exe` path. `assets/` at the repo root is source/template art only.

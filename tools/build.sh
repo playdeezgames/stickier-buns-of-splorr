@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 ODIN="${ODIN:-/home/yermom/ODIN/odin}"
 mkdir -p build/web
-"$ODIN" build odin/web -collection:sb=odin -target:js_wasm32 -out:build/web/game.wasm -o:speed -vet-shadowing -vet-unused
+"$ODIN" build odin/web -collection:sb=odin -target:js_wasm32 -out:build/web/game.wasm ${ODIN_OPT:--o:speed} -vet-shadowing -vet-unused
 cp "$("$ODIN" root)/core/sys/wasm/js/odin.js" build/web/
 cp web/index.html build/web/
 cp -r web/assets build/web/

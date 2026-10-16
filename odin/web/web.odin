@@ -91,3 +91,30 @@ step :: proc(dt: f64, c: runtime.Context) -> bool {
 	render(&world, &ui)
 	return true
 }
+
+// QA hook for screenshots: the page calls this for ?scene=N. 1 mid-game, 2 shoppe, 3 dead.
+@(export)
+debug_scene :: proc "c" (n: i32) {
+	context = runtime.default_context()
+	a := &world.avatar
+	switch n {
+	case 1:
+		a.buns, a.maximum_buns = 9, 17
+		a.health, a.maximum_health = 3, 4
+		a.armour, a.jools, a.floggers, a.lotions, a.sprays = 3, 12, 1, 2, 1
+		a.xp, a.xp_goal, a.xp_level = 3, 10, 1
+		game.add_message(&world, "+5 buns")
+		game.add_message(&world, "+7 Jools!")
+		game.add_message(&world, "You take 1 damage!")
+	case 2:
+		a.jools = 40
+		a.shoppe = true
+		game.add_message(&world, "+3 XP")
+		game.add_message(&world, "Yer now level 1")
+	case 3:
+		a.health = 0
+		game.add_message(&world, "You take 3 damage!")
+		game.add_message(&world, "-3 health!")
+		game.hilite(&world)
+	}
+}

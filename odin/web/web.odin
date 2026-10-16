@@ -28,12 +28,25 @@ main :: proc() {
 	rand.reset(u64(time.now()._nsec))
 	game.world_init(&world)
 	js.add_event_listener("screen", .Mouse_Move, nil, on_mouse_move)
+	js.add_event_listener("screen", .Mouse_Down, nil, on_mouse_down)
+}
+
+// Pointer position in the 1280x720 logical screen.
+logical_xy :: proc(e: js.Event) -> (int, int) {
+	scale := f32(game.SCREEN_WIDTH) / css_width()
+	return int(f32(e.mouse.offset.x) * scale), int(f32(e.mouse.offset.y) * scale)
 }
 
 on_mouse_move :: proc(e: js.Event) {
 	context = ctx
-	scale := f32(game.SCREEN_WIDTH) / css_width()
-	game.ui_mouse_moved(&ui, &world, int(f32(e.mouse.offset.x) * scale), int(f32(e.mouse.offset.y) * scale))
+	x, y := logical_xy(e)
+	game.ui_mouse_moved(&ui, &world, x, y)
+}
+
+on_mouse_down :: proc(e: js.Event) {
+	context = ctx
+	x, y := logical_xy(e)
+	game.ui_mouse_pressed(&ui, &world, x, y)
 }
 
 // The page reads the image list through these, so the table lives only in Odin.

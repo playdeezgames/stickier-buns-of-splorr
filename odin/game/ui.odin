@@ -40,3 +40,18 @@ ui_mouse_moved :: proc(ui: ^UI, w: ^World, x, y: int) {
 	ui.cursor_x, ui.cursor_y = map_xy(x, y)
 	ui_update_tooltip(ui, w)
 }
+
+// A click goes to the first enabled button under the pointer, otherwise to the board. (The Lua
+// also moved the knight after a button click, because handleClick never returned a value.)
+ui_mouse_pressed :: proc(ui: ^UI, w: ^World, x, y: int) {
+	ui_mouse_moved(ui, w, x, y)
+	for id in Button_Id {
+		if ui.hover[id] && button_enabled(w, id) {
+			button_press(w, id)
+			ui_update_tooltip(ui, w)
+			return
+		}
+	}
+	attempt_move(w, ui.cursor_x, ui.cursor_y)
+	ui_update_tooltip(ui, w)
+}

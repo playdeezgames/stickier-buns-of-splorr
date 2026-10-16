@@ -598,3 +598,87 @@ test_ui_tooltips :: proc(t: ^testing.T) {
 	ui_mouse_moved(&ui, &w, 600, 130)
 	testing.expect_value(t, ui_tooltip(&ui), "Upgrade Buns(-15 Jools)")
 }
+
+// Screen point in the middle of a cell's tile.
+cell_point :: proc(x, y: int) -> (int, int) {
+	px, py := plot_xy(x, y)
+	return px + TILE_WIDTH / 2, py + TILE_HEIGHT / 2
+}
+
+@(test)
+test_click_moves_knight :: proc(t: ^testing.T) {
+	w := bare_world(3, 3)
+	ui: UI
+	x, y := cell_point(5, 4)
+	ui_mouse_pressed(&ui, &w, x, y)
+	testing.expect_value(t, w.avatar.x, 5)
+	testing.expect_value(t, w.avatar.y, 4)
+	x, y = cell_point(0, 0) // not a knight move from here
+	ui_mouse_pressed(&ui, &w, x, y)
+	testing.expect_value(t, w.avatar.x, 5)
+}
+
+@(test)
+test_button_click_does_not_move :: proc(t: ^testing.T) {
+	// Lotion button sits over the board's lower-right corner region of the screen.
+	w := bare_world(3, 3)
+	w.avatar.lotions = 1
+	w.avatar.health = 1
+	ui: UI
+	bx, by := button_table[.Use_Lotion].x + 10, button_table[.Use_Lotion].y + 10
+	// Make the cell under the button a legal move, to prove the click does not fall through.
+	cx, cy := map_xy(bx, by)
+	set_avatar(&w, cx - 2, cy - 1) // may be off board; handled below
+	if !in_bounds(cx - 2, cy - 1) {
+		set_avatar(&w, cx - 1, cy - 2)
+	}
+	ax, ay := w.avatar.x, w.avatar.y
+	testing.expect(t, w.cells[cx][cy].hilite)
+	ui_mouse_pressed(&ui, &w, bx, by)
+	testing.expect_value(t, w.avatar.health, 3)
+	testing.expect_value(t, w.avatar.lotions, 0)
+	testing.expect_value(t, w.avatar.x, ax)
+	testing.expect_value(t, w.avatar.y, ay)
+
+	// A disabled button does not swallow the click.
+	ui_mouse_pressed(&ui, &w, bx, by)
+	testing.expect_value(t, w.avatar.x, cx)
+	testing.expect_value(t, w.avatar.y, cy)
+}
+
+@(test)
+test_shop_clicks :: proc(t: ^testing.T) {
+	w := bare_world(3, 3)
+	w.avatar.shoppe = true
+	w.avatar.jools = 30
+	ui: UI
+	click :: proc(ui: ^UI, w: ^World, id: Button_Id) {
+		b := button_table[id]
+		ui_mouse_pressed(ui, w, b.x + 5, b.y + 5)
+	}
+	click(&ui, &w, .Buy_Lotion)
+	testing.expect_value(t, w.avatar.lotions, 1)
+	testing.expect_value(t, w.avatar.jools, 20)
+	click(&ui, &w, .Upgrade_Buns) // costs 15
+	testing.expect_value(t, w.avatar.maximum_buns, 16)
+	testing.expect_value(t, w.avatar.jools, 5)
+	click(&ui, &w, .Flogger) // can't afford: ignored, and no board move in the shoppe
+	testing.expect_value(t, w.avatar.floggers, 0)
+	click(&ui, &w, .Leave)
+	testing.expect(t, !w.avatar.shoppe)
+}
+
+@(test)
+test_play_again :: proc(t: ^testing.T) {
+	w := bare_world(3, 3)
+	w.avatar.health = 0
+	w.avatar.jools = 99
+	ui: UI
+	b := button_table[.Play]
+	ui_mouse_pressed(&ui, &w, b.x + 5, b.y + 5)
+	testing.expect_value(t, w.avatar.health, 3)
+	testing.expect_value(t, w.avatar.jools, 0)
+	testing.expect_value(t, count_tokens(&w, .Pawn), PAWN_COUNT)
+	testing.expect_value(t, w.message_count, 0)
+	testing.expect(t, w.random != nil)
+}

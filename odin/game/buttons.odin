@@ -95,3 +95,18 @@ button_contains :: proc(id: Button_Id, x, y: int) -> bool {
 	b := button_table[id]
 	return x >= b.x && y >= b.y && x < b.x + BUTTON_SIZE && y < b.y + BUTTON_SIZE
 }
+
+// Play restarts the game (keeping the random source); the shop buttons buy.
+button_press :: proc(w: ^World, id: Button_Id) {
+	switch id {
+	case .Use_Lotion:
+		use_lotion(w)
+	case .Play:
+		world_init(w)
+	case .Leave:
+		w.avatar.shoppe = false
+	case .Upgrade_Buns, .Buy_Lotion, .Flogger, .Armour, .Spray:
+		item, _ := button_item(id)
+		buy(w, item)
+	}
+}

@@ -519,3 +519,82 @@ test_cell_centres_round_trip :: proc(t: ^testing.T) {
 test_mousemap_data_size :: proc(t: ^testing.T) {
 	testing.expect_value(t, len(MOUSEMAP_DATA), MOUSEMAP_WIDTH * MOUSEMAP_HEIGHT)
 }
+
+@(test)
+test_button_layout :: proc(t: ^testing.T) {
+	// Positions from constants.lua.
+	testing.expect_value(t, button_table[.Use_Lotion].x, 1184)
+	testing.expect_value(t, button_table[.Use_Lotion].y, 624)
+	testing.expect_value(t, button_table[.Play].x, 1184)
+	testing.expect_value(t, button_table[.Leave].x, 592)
+	testing.expect_value(t, button_table[.Leave].y, 0)
+	testing.expect_value(t, button_table[.Upgrade_Buns].y, 120)
+	testing.expect_value(t, button_table[.Buy_Lotion].y, 240)
+	testing.expect_value(t, button_table[.Flogger].y, 360)
+	testing.expect_value(t, button_table[.Armour].y, 480)
+	testing.expect_value(t, button_table[.Spray].y, 600)
+	testing.expect(t, button_contains(.Leave, 592, 0))
+	testing.expect(t, button_contains(.Leave, 687, 95))
+	testing.expect(t, !button_contains(.Leave, 688, 95))
+	testing.expect(t, !button_contains(.Leave, 591, 0))
+}
+
+@(test)
+test_button_enabled_and_tooltips :: proc(t: ^testing.T) {
+	w := bare_world(3, 3)
+	buf: [TOOLTIP_CAPACITY]u8
+	for id in Button_Id {
+		testing.expect(t, !button_enabled(&w, id))
+	}
+	w.avatar.lotions = 1
+	testing.expect(t, button_enabled(&w, .Use_Lotion))
+	testing.expect(t, !button_enabled(&w, .Play))
+	w.avatar.health = 0
+	testing.expect(t, !button_enabled(&w, .Use_Lotion))
+	testing.expect(t, button_enabled(&w, .Play))
+	w.avatar.health = 3
+	w.avatar.shoppe = true
+	testing.expect(t, !button_enabled(&w, .Use_Lotion))
+	testing.expect(t, button_enabled(&w, .Leave))
+	testing.expect(t, !button_enabled(&w, .Spray)) // no jools
+	w.avatar.jools = 10
+	testing.expect(t, button_enabled(&w, .Spray))
+	testing.expect(t, button_enabled(&w, .Buy_Lotion))
+	testing.expect(t, !button_enabled(&w, .Flogger))
+	testing.expect_value(t, button_tooltip(&w, .Buy_Lotion, buf[:]), "Buy Lotion(-10 Jools)")
+	testing.expect_value(t, button_tooltip(&w, .Upgrade_Buns, buf[:]), "Upgrade Buns(-15 Jools)")
+	testing.expect_value(t, button_tooltip(&w, .Flogger, buf[:]), "Buy Flogger(-25 Jools)")
+	testing.expect_value(t, button_tooltip(&w, .Armour, buf[:]), "Buy Armour(-6 Jools)")
+	testing.expect_value(t, button_tooltip(&w, .Spray, buf[:]), "Buy Trap Spray(-1 Jools)")
+	testing.expect_value(t, button_tooltip(&w, .Leave, buf[:]), "Leave Shoppe")
+}
+
+@(test)
+test_ui_tooltips :: proc(t: ^testing.T) {
+	w := bare_world(3, 3)
+	place_token(&w, 5, 4, .Pawn)
+	ui: UI
+	px, py := plot_xy(5, 4)
+	ui_mouse_moved(&ui, &w, px + 80, py + 40)
+	testing.expect_value(t, ui.cursor_x, 5)
+	testing.expect_value(t, ui.cursor_y, 4)
+	testing.expect_value(t, ui_tooltip(&ui), "Pawn (enemy)")
+	ui_mouse_moved(&ui, &w, px + 80, py + 1000) // off the board: clamped
+	testing.expect_value(t, ui.cursor_y, BOARD_HEIGHT - 1)
+
+	// Over an enabled button its tooltip wins; a disabled one is ignored.
+	w.avatar.lotions = 1
+	ui_mouse_moved(&ui, &w, 1200, 640)
+	testing.expect_value(t, ui_tooltip(&ui), "Use Lotion")
+	w.avatar.lotions = 0
+	ui_mouse_moved(&ui, &w, 1200, 640)
+	testing.expect(t, ui_tooltip(&ui) != "Use Lotion")
+
+	// In the shoppe, no token tooltips.
+	w.avatar.shoppe = true
+	ui_mouse_moved(&ui, &w, px + 80, py + 40)
+	testing.expect_value(t, ui_tooltip(&ui), "")
+	w.avatar.jools = 50
+	ui_mouse_moved(&ui, &w, 600, 130)
+	testing.expect_value(t, ui_tooltip(&ui), "Upgrade Buns(-15 Jools)")
+}

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stickier Buns of SPLORR!!</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; }
+  body { display: flex; align-items: center; justify-content: center; }
+  canvas { image-rendering: pixelated; width: min(100vw, calc(100vh * 1280 / 720)); height: auto; }
+</style>
+</head>
+<body>
+<canvas id="screen" width="1280" height="720"></canvas>
+<script type="text/javascript" src="odin.js"></script>
+<script type="text/javascript">
+(function () {
+  const canvas = document.getElementById("screen");
+  const g = canvas.getContext("2d");
+  g.imageSmoothingEnabled = false;
+  const hex = (rgb) => "#" + (rgb >>> 0).toString(16).padStart(6, "0");
+
+  // --- Assets: image list comes from Odin (image_count / image_path_*), plus the font. ---
+  const memory = new odin.WasmMemoryInterface();
+  const images = [];
+  let ready = false;
+  async function loadAssets() {
+    while (!memory.exports) await new Promise((r) => setTimeout(r, 10));
+    const x = memory.exports;
+    const n = x.image_count();
+    const loads = [];
+    for (let i = 0; i < n; i++) {
+      const path = memory.loadString(x.image_path_ptr(i), x.image_path_len(i));
+      loads.push(new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => { images[i] = img; resolve(); };
+        img.onerror = () => reject(new Error("missing image " + path));
+        img.src = "assets/images/" + path;
+      }));
+    }
+    const font = new FontFace("Antiquity", "url(assets/fonts/antiquity-print.ttf)");
+    loads.push(font.load().then((f) => document.fonts.add(f)));
+    await Promise.all(loads);
+    ready = true;
+  }
+
+  const imports = {
+    canvas: {
+      fill_rect: (x, y, w, h, rgb) => { g.fillStyle = hex(rgb); g.fillRect(x, y, w, h); },
+      css_width: () => canvas.getBoundingClientRect().width,
+      assets_ready: () => ready,
+      draw_image: (sprite, x, y) => { const img = images[sprite]; if (img) g.drawImage(img, x, y); },
+      draw_text: (size, ptr, len, x, y, rgb) => {
+        g.font = size + "px Antiquity";
+        g.textBaseline = "top";
+        g.fillStyle = hex(rgb);
+        g.fillText(memory.loadString(ptr, len), x, y);
+      },
+      font_height: (size) => {
+        g.font = size + "px Antiquity";
+        const m = g.measureText("Mg");
+        return m.fontBoundingBoxAscent + m.fontBoundingBoxDescent;
+      },
+      text_width: (size, ptr, len) => {
+        g.font = size + "px Antiquity";
+        return g.measureText(memory.loadString(ptr, len)).width;
+      },
+    },
+  };
+
+  window.addEventListener("load", () => {
+    odin.runWasm("game.wasm", null, imports, memory);
+    loadAssets().catch((e) => console.error(e));
+    // QA hook: ?scene=N jumps to a canned game state (used for screenshots).
+    const scene = new URLSearchParams(location.search).get("scene");
+    if (scene) {
+      const t = setInterval(() => {
+        if (memory.exports && memory.exports.debug_scene) { clearInterval(t); memory.exports.debug_scene(Number(scene)); }
+      }, 10);
+    }
+  });
+})();
+</script>
+</body>
+</html>

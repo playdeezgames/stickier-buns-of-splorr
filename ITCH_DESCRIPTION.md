@@ -9,6 +9,8 @@ A knight, a chessboard, and a dangerous appetite for stickier buns.
 
 ## Paste this as the page description
 
+**Latest version:** https://playdeezgames.github.io/stickier-buns-of-splorr/
+
 Yer a KNIGHT, and yer hungry. The board is crawling with PAWNS, and somewhere on it are STICKIER BUNS.
 
 **How to play**
